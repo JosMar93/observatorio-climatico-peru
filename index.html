@@ -118,14 +118,15 @@
     }
 
     .brand-mark {
-      width: 38px;
-      height: 38px;
+      width: 50px;
+      height: 50px;
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: radial-gradient(circle at 35% 30%, rgba(56, 189, 248, 0.16), rgba(255, 255, 255, 0.06));
+      border: 1px solid rgba(255, 255, 255, 0.22);
       display: grid;
       place-items: center;
       flex-shrink: 0;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
 
     .brand-title {
@@ -266,6 +267,166 @@
 
     .btn-navy:hover {
       background-color: var(--navy-800);
+    }
+
+    /* Temperature Unit Toggle (°C / °F) */
+    .unit-toggle {
+      display: inline-flex;
+      align-items: center;
+      height: 38px;
+      padding: 3px;
+      border-radius: var(--radius-md);
+      background-color: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      gap: 2px;
+    }
+
+    .unit-btn {
+      height: 30px;
+      min-width: 36px;
+      padding: 0 9px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+
+    .unit-btn:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .unit-btn[aria-pressed="true"] {
+      background-color: #ffffff;
+      color: var(--navy-900);
+    }
+
+    /* Large Module Navigation Bar */
+    .module-bar {
+      background-color: var(--navy-950);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .module-bar-inner {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .module-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 22px;
+      min-height: 52px;
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-bottom: none;
+      border-top: 3px solid transparent;
+      border-radius: 10px 10px 0 0;
+      color: #cbd5e1;
+      cursor: pointer;
+      text-align: left;
+      transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+    }
+
+    .module-tab:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .module-tab[aria-selected="true"] {
+      background-color: var(--bg-surface);
+      color: var(--navy-900);
+      border-color: var(--border-hairline);
+      border-top-color: var(--accent-blue);
+    }
+
+    .module-tab[data-module="seismic"][aria-selected="true"] {
+      border-top-color: var(--alert-red);
+    }
+
+    .module-tab-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+    }
+
+    .module-tab[aria-selected="true"] .module-tab-icon {
+      background-color: #eff6ff;
+      color: var(--accent-blue);
+    }
+
+    .module-tab[data-module="seismic"][aria-selected="true"] .module-tab-icon {
+      background-color: #fef2f2;
+      color: var(--alert-red);
+    }
+
+    .module-tab-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .module-tab-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .module-tab-sub {
+      font-size: 0.72rem;
+      font-weight: 500;
+      opacity: 0.84;
+      line-height: 1.2;
+    }
+
+    .module-tab-count {
+      margin-left: 4px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      background-color: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    .module-tab[aria-selected="true"] .module-tab-count {
+      background-color: var(--bg-subtle);
+      color: var(--navy-900);
+      border: 1px solid var(--border-hairline);
+    }
+
+    @media (max-width: 680px) {
+      .module-bar-inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .module-tab {
+        padding: 10px 12px;
+        min-height: 48px;
+      }
+      .module-tab-sub, .module-tab-count {
+        display: none;
+      }
+      .module-tab-title {
+        font-size: 0.85rem;
+      }
     }
 
     /* Sub-header transparency & daily auto-update bar */
@@ -537,6 +698,15 @@
       border-radius: 3px;
       border: 1px solid rgba(15, 23, 42, 0.2);
       flex-shrink: 0;
+    }
+
+    .legend-note {
+      margin-top: 7px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-hairline);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.35;
     }
 
     .map-mode-note {
@@ -902,6 +1072,189 @@
       flex-wrap: wrap;
     }
 
+    /* Seismic Activity Module */
+    .seismic-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .seismic-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      border: 1px solid var(--border-strong);
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .seismic-status-pill.live {
+      background-color: var(--alert-green-bg);
+      border-color: var(--alert-green-border);
+      color: var(--alert-green);
+    }
+
+    .seismic-status-pill.fallback {
+      background-color: var(--alert-yellow-bg);
+      border-color: var(--alert-yellow-border);
+      color: var(--alert-yellow);
+    }
+
+    .seismic-meta-bar {
+      background-color: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .seismic-ref-links {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .seismic-ref-links a {
+      color: var(--navy-800);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(19, 49, 89, 0.35);
+      padding-bottom: 1px;
+    }
+
+    .seismic-ref-links a:hover {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    .seismic-summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-hairline);
+      background-color: #fafbfd;
+    }
+
+    .seismic-stat-box {
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-surface);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .seismic-stat-lbl {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .seismic-stat-val {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .seismic-stat-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mag-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .mag-high {
+      background-color: var(--alert-red-bg);
+      color: var(--alert-red);
+      border-color: var(--alert-red-border);
+    }
+
+    .mag-mod {
+      background-color: var(--alert-orange-bg);
+      color: var(--alert-orange);
+      border-color: var(--alert-orange-border);
+    }
+
+    .mag-low {
+      background-color: var(--bg-subtle);
+      color: var(--navy-900);
+      border-color: var(--border-strong);
+    }
+
+    .depth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: var(--radius-sm);
+      font-size: 0.74rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .depth-shallow {
+      background-color: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecaca;
+    }
+
+    .depth-intermediate {
+      background-color: #fff7ed;
+      color: #c2410c;
+      border-color: #fed7aa;
+    }
+
+    .depth-deep {
+      background-color: #eff6ff;
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+
+    tbody tr.selected-seismic-row {
+      background-color: #fef2f2;
+    }
+
+    @media (max-width: 900px) {
+      .seismic-summary-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .seismic-summary-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Comparative National Table */
     .table-wrap {
       overflow-x: auto;
@@ -1082,7 +1435,7 @@
     }
 
     @media print {
-      .controls-bar, .header-actions, .map-stage, .site-footer, .toast {
+      .module-bar, .controls-bar, .header-actions, .map-stage, .site-footer, .toast {
         display: none !important;
       }
       body {
@@ -1101,14 +1454,45 @@
     <div class="container header-inner">
       <div class="brand-block">
         <div class="brand-mark" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="ocnpGlobeGrad" cx="38%" cy="32%" r="65%">
+                <stop offset="0%" stop-color="#1e4b85" />
+                <stop offset="100%" stop-color="#07162b" />
+              </radialGradient>
+              <linearGradient id="ocnpPeruFill" x1="20" y1="16" x2="38" y2="48" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#f8fafc" />
+                <stop offset="100%" stop-color="#cbd5e1" />
+              </linearGradient>
+              <clipPath id="ocnpGlobeClip">
+                <circle cx="32" cy="32" r="23.5" />
+              </clipPath>
+            </defs>
+            <circle cx="32" cy="32" r="29" stroke="#60a5fa" stroke-opacity="0.38" stroke-width="1" stroke-dasharray="2 3" />
+            <circle cx="32" cy="32" r="23.5" fill="url(#ocnpGlobeGrad)" stroke="#93c5fd" stroke-width="1.5" />
+            <g clip-path="url(#ocnpGlobeClip)" opacity="0.45">
+              <ellipse cx="32" cy="32" rx="11.5" ry="23.5" stroke="#7dd3fc" stroke-width="0.9" />
+              <line x1="32" y1="8.5" x2="32" y2="55.5" stroke="#7dd3fc" stroke-width="0.9" />
+              <path d="M9.5 23.5 Q32 27.5 54.5 23.5" stroke="#7dd3fc" stroke-width="0.9" />
+              <line x1="8.5" y1="32" x2="55.5" y2="32" stroke="#7dd3fc" stroke-width="0.9" />
+              <path d="M9.5 40.5 Q32 36.5 54.5 40.5" stroke="#7dd3fc" stroke-width="0.9" />
+            </g>
+            <!-- Silueta estilizada del Perú -->
+            <path d="M27.4 16.4 L31.2 15.8 L34.8 18.2 L34.2 21.6 L36.8 25.0 L37.3 29.8 L39.2 33.4 L38.0 37.8 L35.2 42.0 L32.8 46.2 L29.6 44.0 L26.2 39.2 L24.2 33.6 L22.2 28.4 L21.4 23.8 L23.6 19.6 Z" fill="url(#ocnpPeruFill)" stroke="#fbbf24" stroke-width="1.35" stroke-linejoin="round" />
+            <!-- Sol y nube atmosférica -->
+            <circle cx="48.5" cy="14.5" r="4.1" fill="#fbbf24" />
+            <path d="M48.5 7.6V9.3M48.5 19.7V21.4M41.6 14.5H43.3M53.7 14.5H55.4M43.7 9.7L44.9 10.9M52.1 18.1L53.3 19.3M53.3 9.7L52.1 10.9" stroke="#fcd34d" stroke-width="1.25" stroke-linecap="round" />
+            <path d="M39.5 21.5H49.1C50.9 21.5 52.2 20.2 52.2 18.6C52.2 17.1 51.1 15.9 49.6 15.7C49.0 13.7 47.1 12.4 44.9 12.4C42.2 12.4 40.2 14.5 40.2 17.1C38.6 17.4 37.5 18.6 37.5 20.0C37.5 20.9 38.4 21.5 39.5 21.5Z" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.1" stroke-linejoin="round" />
+            <!-- Ondas sísmicas y sismograma -->
+            <circle cx="24.5" cy="41.4" r="2.2" fill="#ef4444" stroke="#ffffff" stroke-width="0.9" />
+            <path d="M19.8 37.1A6.5 6.5 0 0 0 28.8 46.1" stroke="#f87171" stroke-width="1.3" stroke-linecap="round" />
+            <path d="M16.4 34.3A11 11 0 0 0 32.0 49.5" stroke="#fca5a5" stroke-width="1.1" stroke-linecap="round" stroke-dasharray="2.5 2" />
+            <path d="M10 51.8 H19 L21.2 47.0 L23.5 56.2 L25.8 44.8 L28.0 54.4 L30.2 49.2 L32.2 51.8 H54" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
         </div>
         <div>
           <h1 class="brand-title">Observatorio Climático Nacional del Perú</h1>
-          <p class="brand-subtitle">Vigilancia meteorológica de las 25 jurisdicciones · Marco SENAMHI, COEN-INDECI y DIHIDRONAV</p>
+          <p class="brand-subtitle">Vigilancia meteorológica (25 jurisdicciones) y monitoreo sísmico · SENAMHI, IGP-CENSIS, COEN-INDECI y DIHIDRONAV</p>
         </div>
       </div>
 
@@ -1124,7 +1508,11 @@
         </div>
 
         <div class="header-actions">
-          <button type="button" class="btn btn-ghost-light" id="btnRefresh" title="Actualizar telemetría meteorológica ahora">
+          <div class="unit-toggle" id="tempUnitToggle" role="group" aria-label="Unidad de temperatura">
+            <button type="button" class="unit-btn" id="btnUnitC" data-unit="C" aria-pressed="true" title="Mostrar temperaturas en grados Celsius (°C)">°C</button>
+            <button type="button" class="unit-btn" id="btnUnitF" data-unit="F" aria-pressed="false" title="Mostrar temperaturas en grados Fahrenheit (°F)">°F</button>
+          </div>
+          <button type="button" class="btn btn-ghost-light" id="btnRefresh" title="Actualizar datos del módulo activo">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="23 4 23 10 17 10"></polyline>
               <polyline points="1 20 1 14 7 14"></polyline>
@@ -1143,6 +1531,38 @@
         </div>
       </div>
     </div>
+
+    <!-- Barra Principal de Módulos -->
+    <nav class="module-bar" aria-label="Módulos principales del observatorio">
+      <div class="container module-bar-inner" role="tablist">
+        <button type="button" class="module-tab" id="tabModuleClimate" data-module="climate" role="tab" aria-selected="true">
+          <span class="module-tab-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M17.66 6.34l1.41-1.41" />
+              <path d="M17.5 19H9a5 5 0 1 1 .8-9.93A4.5 4.5 0 0 1 18 12.5a3.5 3.5 0 0 1-.5 6.5Z" />
+            </svg>
+          </span>
+          <span class="module-tab-text">
+            <span class="module-tab-title">Condiciones Meteorológicas</span>
+            <span class="module-tab-sub">Telemetría climática, alertas SENAMHI y series históricas</span>
+          </span>
+          <span class="module-tab-count">25</span>
+        </button>
+
+        <button type="button" class="module-tab" id="tabModuleSeismic" data-module="seismic" role="tab" aria-selected="false">
+          <span class="module-tab-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 12 6 12 8.5 5 11.5 19 14.5 8 17 12 22 12" />
+            </svg>
+          </span>
+          <span class="module-tab-text">
+            <span class="module-tab-title">Actividad Sísmica</span>
+            <span class="module-tab-sub">Epicentros USGS en vivo, expediente focal y COEN-INDECI</span>
+          </span>
+          <span class="module-tab-count" id="tabSeismicCount">15</span>
+        </button>
+      </div>
+    </nav>
   </header>
 
   <!-- Barra de Transparencia de Fuentes y Actualización Diaria -->
@@ -1153,19 +1573,19 @@
         <span id="sourceModeLabel">Consultando Open-Meteo (OMM/ECMWF/NOAA)...</span>
         <span class="sep" aria-hidden="true">·</span>
         <span>Última actualización: <strong class="tabular" id="lastSyncTime">--</strong></span>
-        <span class="sep" aria-hidden="true">·</span>
-        <span>Ciclo automático diario (00:05 PET): <strong class="tabular" id="nextAutoSync">--</strong></span>
+        <span class="sep" aria-hidden="true" id="autoSyncSep">·</span>
+        <span id="autoSyncWrap">Ciclo automático diario (00:05 PET): <strong class="tabular" id="nextAutoSync">--</strong></span>
       </div>
       <div class="source-meta-line">
-        <span>Cobertura: 24 Departamentos + Prov. Const. del Callao (DZ 1 a DZ 13)</span>
+        <span id="sourceCoverageLabel">Cobertura: 24 Departamentos + Prov. Const. del Callao (DZ 1 a DZ 13)</span>
       </div>
     </div>
   </div>
 
-  <!-- Barra de Controles -->
-  <div class="controls-bar">
+  <!-- Sub-barra Exclusiva de Condiciones Meteorológicas -->
+  <div class="controls-bar" id="climateSubBar">
     <div class="container controls-inner">
-      <div class="layer-tabs" role="group" aria-label="Capas temáticas del mapa">
+      <div class="layer-tabs" role="group" aria-label="Capas temáticas climáticas del mapa">
         <button type="button" class="layer-tab" data-layer="temp" aria-pressed="true">Temperatura Actual (°C)</button>
         <button type="button" class="layer-tab" data-layer="alert" aria-pressed="false">Nivel de Alerta</button>
         <button type="button" class="layer-tab" data-layer="uv" aria-pressed="false">Radiación UV</button>
@@ -1196,7 +1616,7 @@
   <!-- Contenido Principal -->
   <main class="container main-content">
     <!-- Resumen Nacional: 4 KPIs -->
-    <section class="kpi-grid" aria-label="Resumen térmico y alertas nacionales">
+    <section class="kpi-grid" id="climateKpiGrid" aria-label="Resumen térmico y alertas nacionales">
       <article class="kpi-card">
         <div class="kpi-label">
           <span>Promedio Costa</span>
@@ -1237,10 +1657,10 @@
     <!-- Área de Trabajo 2 Columnas -->
     <section class="workspace-grid" aria-label="Mapa geográfico y expediente climático regional">
       <!-- Izquierda: Mapa Geográfico -->
-      <div class="panel">
+      <div class="panel" id="mapPanel">
         <div class="panel-header">
           <div>
-            <h2 class="panel-title">Mapa Geográfico de Vigilancia Climática</h2>
+            <h2 class="panel-title" id="mapPanelTitle">Mapa Geográfico de Vigilancia Climática</h2>
             <div class="panel-subtitle" id="mapLayerSubtitle">Capa activa: Temperatura Actual (°C) · Haga clic en una jurisdicción para inspeccionar</div>
           </div>
           <button type="button" class="btn btn-outline" id="btnResetZoom" style="height:32px; padding:0 10px; font-size:0.76rem;">
@@ -1348,10 +1768,95 @@
           </div>
         </div>
       </div>
+
+      <!-- Derecha (Alterno): Expediente Sísmico del Evento -->
+      <div class="panel" id="seismicDossier" style="display:none;" aria-label="Expediente sísmico del evento seleccionado">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Expediente Sísmico del Evento</h2>
+            <div class="panel-subtitle" id="seisDosSubtitle">Evaluación geofísica y recomendaciones COEN-INDECI</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <a id="seisDosSourceLink" href="https://ultimosismo.igp.gob.pe" target="_blank" rel="noopener noreferrer" class="btn btn-navy" style="height:32px; padding:0 12px; font-size:0.76rem; text-decoration:none;">
+              Ver en USGS / IGP ↗
+            </a>
+          </div>
+        </div>
+
+        <div class="dossier-body">
+          <div class="dossier-top">
+            <div>
+              <h3 class="region-name" id="seisDosPlace" style="font-size:1.22rem;">--</h3>
+              <div class="region-meta">
+                <span>Fuente: <strong id="seisDosSource">--</strong></span>
+                <span class="sep" aria-hidden="true">·</span>
+                <span>Capital más cercana: <strong id="seisDosNearestShort">--</strong></span>
+              </div>
+            </div>
+            <div id="seisDosDepthBadge" class="alert-tag alert-Verde">--</div>
+          </div>
+
+          <!-- Cuadrícula de 6 Métricas Sísmicas -->
+          <div class="metrics-grid" aria-label="Parámetros del sismo seleccionado">
+            <div class="metric-cell">
+              <span class="metric-label">Magnitud (M)</span>
+              <span class="metric-val tabular" id="seisDosMag">--</span>
+              <span class="metric-note" id="seisDosMagNote">--</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Profundidad Focal</span>
+              <span class="metric-val tabular" id="seisDosDepth">--<span class="metric-unit">km</span></span>
+              <span class="metric-note" id="seisDosDepthClass">--</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Coordenadas Exactas</span>
+              <span class="metric-val tabular" id="seisDosCoords" style="font-size:0.96rem;">--</span>
+              <span class="metric-note">Latitud / Longitud (WGS84)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Fecha y Hora (PET)</span>
+              <span class="metric-val tabular" id="seisDosTimePet" style="font-size:0.92rem;">--</span>
+              <span class="metric-note" id="seisDosTimeRel">Hora Oficial Perú (UTC-5)</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Capital Departamental Cercana</span>
+              <span class="metric-val tabular" id="seisDosDist">--<span class="metric-unit">km</span></span>
+              <span class="metric-note" id="seisDosDistTarget">--</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Percepción Estimada</span>
+              <span class="metric-val" id="seisDosPerception" style="font-size:0.95rem;">--</span>
+              <span class="metric-note" id="seisDosPerceptionNote">Mercalli Modificada (est.)</span>
+            </div>
+          </div>
+
+          <!-- Bloque de Evaluación Sísmica y Recomendación COEN-INDECI -->
+          <div class="science-block">
+            <h4 class="science-heading">
+              <span>Evaluación de Percepción y Recomendación COEN-INDECI / IGP</span>
+              <span class="tabular" id="seisDosEventId" style="font-size:0.74rem; color:var(--navy-800);">--</span>
+            </h4>
+            <div class="science-rows">
+              <div>
+                <span class="science-row-title">Clasificación Focal y Proximidad a Capitales</span>
+                <p class="science-row-text" id="seisDosTectonic">--</p>
+              </div>
+              <div>
+                <span class="science-row-title">Nivel de Percepción Superficial y Condición Costera</span>
+                <p class="science-row-text" id="seisDosImpact">--</p>
+              </div>
+              <div>
+                <span class="science-row-title">Recomendaciones Operativas COEN-INDECI</span>
+                <div class="applicable-bulletins" id="seisDosCoenList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Sección de Gráficos Históricos -->
-    <section class="panel" aria-label="Gráficos históricos y climatología regional">
+    <section class="panel" id="historicalChartsSection" aria-label="Gráficos históricos y climatología regional">
       <div class="panel-header">
         <div>
           <h2 class="panel-title">Análisis de Series Históricas y Climatología — <span id="chartRegionName">Lima</span></h2>
@@ -1384,7 +1889,7 @@
           <div class="chart-head">
             <div>
               <h3 class="chart-title">Régimen Climático Anual (Normales Ene–Dic)</h3>
-              <div class="chart-caption">Ciclo estacional de temperatura media (°C) y precipitación mensual (mm)</div>
+              <div class="chart-caption" id="monthlyChartCaption">Ciclo estacional de temperatura media (°C) y precipitación mensual (mm)</div>
             </div>
           </div>
           <div class="svg-chart-wrap" id="chartMonthlyWrap"></div>
@@ -1396,7 +1901,7 @@
     </section>
 
     <!-- Tablero de Boletines y Alertas en Tiempo Real -->
-    <section class="panel" aria-label="Tablero de boletines meteorológicos vigentes">
+    <section class="panel" id="bulletinsSection" aria-label="Tablero de boletines meteorológicos vigentes">
       <div class="panel-header">
         <div>
           <h2 class="panel-title">Tablero de Alertas y Boletines Vigentes en Tiempo Real</h2>
@@ -1413,8 +1918,84 @@
       <div class="bulletins-grid" id="bulletinsGrid"></div>
     </section>
 
+    <!-- Módulo de Actividad Sísmica en el Perú -->
+    <section class="panel" id="seismicSection" style="display:none;" aria-label="Actividad sísmica en el Perú">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Tablero y Listado de Sismos Recientes en el Perú (USGS · Ref. IGP-CENSIS / COEN-INDECI)</h2>
+          <div class="panel-subtitle">Últimos 15 eventos sísmicos en el dominio peruano (19°S–0.5°N, 82°O–68°O) · Fecha y hora oficial de Perú (PET, UTC-5)</div>
+        </div>
+        <div class="seismic-actions">
+          <span class="seismic-status-pill" id="seismicStatusPill">
+            <span class="sync-dot loading" id="seismicSyncDot"></span>
+            <span id="seismicSyncText">Consultando USGS...</span>
+          </span>
+          <button type="button" class="btn btn-outline" id="btnFocusLatestSeismic" style="height:34px; padding:0 12px; font-size:0.78rem;">
+            Centrar último sismo
+          </button>
+          <button type="button" class="btn btn-navy" id="btnRefreshSeismic" style="height:34px; padding:0 12px; font-size:0.78rem;" title="Actualizar catálogo sísmico desde USGS">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Actualizar sismos
+          </button>
+        </div>
+      </div>
+
+      <div class="seismic-meta-bar">
+        <div>
+          <span>Subducción Placa de Nazca / Sudamericana · Última consulta: <strong class="tabular" id="seismicLastSync">--</strong></span>
+        </div>
+        <div class="seismic-ref-links">
+          <span>Referencias oficiales del Perú:</span>
+          <a href="https://ultimosismo.igp.gob.pe" target="_blank" rel="noopener noreferrer">IGP - CENSIS (ultimosismo.igp.gob.pe)</a>
+          <a href="https://www.gob.pe/indeci" target="_blank" rel="noopener noreferrer">COEN - INDECI (gob.pe/indeci)</a>
+        </div>
+      </div>
+
+      <div class="seismic-summary-strip" id="seismicSummaryStrip">
+        <div class="seismic-stat-box">
+          <span class="seismic-stat-lbl">Último Sismo Registrado</span>
+          <span class="seismic-stat-val tabular" id="seisLatestMag">--</span>
+          <span class="seismic-stat-sub" id="seisLatestPlace">Consultando...</span>
+        </div>
+        <div class="seismic-stat-box">
+          <span class="seismic-stat-lbl">Mayor Magnitud (Últimos 15)</span>
+          <span class="seismic-stat-val tabular" id="seisMaxMag">--</span>
+          <span class="seismic-stat-sub" id="seisMaxPlace">--</span>
+        </div>
+        <div class="seismic-stat-box">
+          <span class="seismic-stat-lbl">Sismos Superficiales (&lt; 60 km)</span>
+          <span class="seismic-stat-val tabular" id="seisShallowCount">--</span>
+          <span class="seismic-stat-sub">Mayor potencial de percepción en superficie</span>
+        </div>
+        <div class="seismic-stat-box">
+          <span class="seismic-stat-lbl">Distribución por Profundidad</span>
+          <span class="seismic-stat-val tabular" id="seisDepthDist">--</span>
+          <span class="seismic-stat-sub">Superficial · Intermedio · Profundo</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Magnitud</th>
+              <th>Profundidad</th>
+              <th>Ubicación y Coordenadas</th>
+              <th>Fecha / Hora (PET)</th>
+              <th class="num">Mapa / Fuente</th>
+            </tr>
+          </thead>
+          <tbody id="seismicTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Tabla Comparativa Nacional -->
-    <section class="panel" aria-label="Tabla comparativa nacional de las 25 jurisdicciones">
+    <section class="panel" id="nationalTableSection" aria-label="Tabla comparativa nacional de las 25 jurisdicciones">
       <div class="panel-header">
         <div>
           <h2 class="panel-title">Tabla Comparativa Nacional (25 Jurisdicciones)</h2>
@@ -1453,6 +2034,7 @@
       <div class="footer-links">
         <a href="https://www.gob.pe/senamhi" target="_blank" rel="noopener noreferrer">gob.pe/senamhi</a>
         <a href="https://observatorio.senamhi.gob.pe" target="_blank" rel="noopener noreferrer">observatorio.senamhi.gob.pe</a>
+        <a href="https://ultimosismo.igp.gob.pe" target="_blank" rel="noopener noreferrer">ultimosismo.igp.gob.pe (IGP)</a>
         <a href="https://www.gob.pe/indeci" target="_blank" rel="noopener noreferrer">gob.pe/indeci</a>
         <a href="https://www.dhn.mil.pe" target="_blank" rel="noopener noreferrer">dhn.mil.pe</a>
       </div>
@@ -2025,18 +2607,55 @@
       // 3. ESTADO GLOBAL Y PERSISTENCIA DIARIA
       // =========================================================================
       const STORAGE_KEY = 'ocnp_peru_telemetry_v2';
+      const UNIT_STORAGE_KEY = 'ocnp_temp_unit_v1';
+      const SEISMIC_STORAGE_KEY = 'ocnp_peru_seismic_v1';
+      const USGS_SEISMIC_URL = 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=-19&maxlatitude=0.5&minlongitude=-82&maxlongitude=-68&limit=15&orderby=time';
+
+      const SEISMIC_FALLBACK = [
+        { id: 'IGP-REF-01', mag: 4.8, place: '42 km al OSO de San Vicente de Cañete, Lima', depth: 46.0, lat: -13.18, lon: -76.76, offsetHours: 4, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-02', mag: 4.5, place: '28 km al SO de Camaná, Arequipa', depth: 38.4, lat: -16.82, lon: -72.89, offsetHours: 11, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-03', mag: 5.1, place: '64 km al NE de Pucallpa, Ucayali', depth: 148.2, lat: -7.95, lon: -74.12, offsetHours: 19, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-04', mag: 4.2, place: '35 km al S de Nazca, Ica', depth: 44.5, lat: -15.14, lon: -74.98, offsetHours: 27, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-05', mag: 4.9, place: '58 km al O de Chimbote, Áncash', depth: 52.0, lat: -9.15, lon: -79.09, offsetHours: 36, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-06', mag: 4.4, place: '19 km al SE de Tarata, Tacna', depth: 126.0, lat: -17.58, lon: -69.91, offsetHours: 45, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-07', mag: 5.3, place: '78 km al SE de Lagunas, Loreto', depth: 134.5, lat: -5.68, lon: -75.15, offsetHours: 58, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-08', mag: 4.1, place: '24 km al O de Mollendo, Arequipa', depth: 32.0, lat: -17.07, lon: -72.24, offsetHours: 69, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-09', mag: 4.6, place: '48 km al E de Esperanza, Ucayali (Foco profundo)', depth: 582.4, lat: -9.85, lon: -70.42, offsetHours: 82, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-10', mag: 4.0, place: '31 km al SO de Ilo, Moquegua', depth: 49.0, lat: -17.85, lon: -71.56, offsetHours: 96, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-11', mag: 4.3, place: '22 km al N de Moyobamba, San Martín', depth: 98.7, lat: -5.84, lon: -76.95, offsetHours: 112, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-12', mag: 3.9, place: '18 km al SO de Paruro, Cusco', depth: 18.0, lat: -13.88, lon: -71.97, offsetHours: 128, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-13', mag: 4.7, place: '53 km al O de Paita, Piura', depth: 36.2, lat: -5.12, lon: -81.58, offsetHours: 142, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-14', mag: 4.4, place: '62 km al NO de Iberia, Madre de Dios', depth: 604.0, lat: -10.95, lon: -69.92, offsetHours: 160, url: 'https://ultimosismo.igp.gob.pe' },
+        { id: 'IGP-REF-15', mag: 4.2, place: '39 km al OSO de Callao, Prov. Const. del Callao', depth: 48.0, lat: -12.18, lon: -77.49, offsetHours: 175, url: 'https://ultimosismo.igp.gob.pe' }
+      ];
+
       const state = {
         regions: [],
         selectedId: 'LIMA',
+        activeModule: 'climate', // 'climate' | 'seismic'
+        activeClimateLayer: 'temp',
         activeLayer: 'temp',
         macroFilter: 'Todas',
         searchTerm: '',
         bulletinFilter: 'Todas',
         sortKey: 'name',
         sortDir: 'asc',
+        tempUnit: (() => {
+          try {
+            return localStorage.getItem(UNIT_STORAGE_KEY) === 'F' ? 'F' : 'C';
+          } catch (_) {
+            return 'C';
+          }
+        })(),
         syncMode: 'loading', // 'live' | 'fallback' | 'loading'
         lastSyncLima: null,
         lastSyncDateKey: null,
+        seismicEvents: [],
+        seismicSyncMode: 'loading', // 'live' | 'fallback' | 'loading'
+        seismicLastSync: null,
+        selectedSeismicId: null,
+        seismicLayer: null,
+        seismicMarkerById: {},
         mapEngine: 'loading', // 'geojson' | 'markers' | 'svg'
         leafletMap: null,
         geoJsonLayer: null,
@@ -2044,6 +2663,53 @@
         featureById: {},
         markerById: {}
       };
+
+      function convertTemp(celsius) {
+        return state.tempUnit === 'F' ? (celsius * 9 / 5) + 32 : celsius;
+      }
+
+      function tempUnitLabel() {
+        return state.tempUnit === 'F' ? '°F' : '°C';
+      }
+
+      function formatTemp(celsius, decimals = 1) {
+        return `${convertTemp(celsius).toFixed(decimals)} ${tempUnitLabel()}`;
+      }
+
+      function formatTempVal(celsius, decimals = 1) {
+        return convertTemp(celsius).toFixed(decimals);
+      }
+
+      function syncTempUnitUI() {
+        const btnC = document.getElementById('btnUnitC');
+        const btnF = document.getElementById('btnUnitF');
+        if (btnC && btnF) {
+          btnC.setAttribute('aria-pressed', state.tempUnit === 'C' ? 'true' : 'false');
+          btnF.setAttribute('aria-pressed', state.tempUnit === 'F' ? 'true' : 'false');
+        }
+        const tempTab = document.querySelector('.layer-tab[data-layer="temp"]');
+        if (tempTab) {
+          tempTab.textContent = `Temperatura Actual (${tempUnitLabel()})`;
+        }
+        const monthlyCap = document.getElementById('monthlyChartCaption');
+        if (monthlyCap) {
+          monthlyCap.textContent = `Ciclo estacional de temperatura media (${tempUnitLabel()}) y precipitación mensual (mm)`;
+        }
+      }
+
+      function setTempUnit(unit) {
+        const next = unit === 'F' ? 'F' : 'C';
+        if (state.tempUnit === next) return;
+        state.tempUnit = next;
+        try {
+          localStorage.setItem(UNIT_STORAGE_KEY, next);
+        } catch (_) {}
+        syncTempUnitUI();
+        state.regions.forEach(reg => {
+          Object.assign(reg, computeAlertForRegion(reg, reg));
+        });
+        renderAll();
+      }
 
       // =========================================================================
       // 4. UTILIDADES METEOROLÓGICAS, FECHA LIMA Y NORMALIZACIÓN
@@ -2141,7 +2807,7 @@
 
         if (live.tmax >= 35.5) {
           rank = Math.max(rank, 4);
-          reasons.push('Ola de calor severa (Tmáx ≥35.5 °C)');
+          reasons.push(`Ola de calor severa (Tmáx ≥${formatTemp(35.5, 1)})`);
         } else if (live.tmax >= 32.5) {
           rank = Math.max(rank, 3);
           reasons.push('Incremento térmico diurno significativo');
@@ -2152,7 +2818,7 @@
 
         if (live.tmin <= -2.0) {
           rank = Math.max(rank, 3);
-          reasons.push('Helada meteorológica altoandina (Tmín ≤ -2 °C)');
+          reasons.push(`Helada meteorológica altoandina (Tmín ≤ ${formatTemp(-2.0, 0)})`);
         } else if (live.tmin <= 2.5 && reg.alt >= 2800) {
           rank = Math.max(rank, 2);
           reasons.push('Descenso térmico nocturno en sierra');
@@ -2347,16 +3013,46 @@
         const modeLbl = document.getElementById('sourceModeLabel');
         const lastSyncEl = document.getElementById('lastSyncTime');
         const histCaption = document.getElementById('historySourceCaption');
+        const autoWrap = document.getElementById('autoSyncWrap');
+        const autoSep = document.getElementById('autoSyncSep');
+        const covLbl = document.getElementById('sourceCoverageLabel');
+
+        if (state.syncMode === 'live') {
+          histCaption.textContent = 'Serie diaria observada en vivo (Open-Meteo OMM/ECMWF) · Pase el cursor para inspeccionar';
+        } else if (state.syncMode === 'fallback') {
+          histCaption.textContent = 'Serie diaria climatológica de respaldo · Pase el cursor para inspeccionar';
+        }
+
+        if (state.activeModule === 'seismic') {
+          dot.className = 'sync-dot ' + state.seismicSyncMode;
+          if (state.seismicSyncMode === 'live') {
+            txt.textContent = 'En vivo USGS GeoJSON';
+            modeLbl.textContent = 'USGS Earthquake Hazards GeoJSON + Referencia IGP-CENSIS / COEN-INDECI';
+          } else if (state.seismicSyncMode === 'fallback') {
+            txt.textContent = 'Respaldo referencial IGP/USGS';
+            modeLbl.textContent = 'Catálogo sísmico referencial IGP-CENSIS / USGS (sin conexión)';
+          } else {
+            txt.textContent = 'Consultando USGS...';
+            modeLbl.textContent = 'Consultando catálogo sísmico USGS GeoJSON...';
+          }
+          lastSyncEl.textContent = state.seismicLastSync || '--';
+          if (autoWrap) autoWrap.style.display = 'none';
+          if (autoSep) autoSep.style.display = 'none';
+          if (covLbl) covLbl.textContent = 'Dominio sísmico: Perú (19°S–0.5°N, 82°O–68°O) · Últimos 15 eventos (PET)';
+          return;
+        }
+
+        if (autoWrap) autoWrap.style.display = '';
+        if (autoSep) autoSep.style.display = '';
+        if (covLbl) covLbl.textContent = 'Cobertura: 24 Departamentos + Prov. Const. del Callao (DZ 1 a DZ 13)';
 
         dot.className = 'sync-dot ' + state.syncMode;
         if (state.syncMode === 'live') {
           txt.textContent = 'En vivo WMO / Open-Meteo';
           modeLbl.textContent = 'En vivo WMO/Open-Meteo + Validación SENAMHI';
-          histCaption.textContent = 'Serie diaria observada en vivo (Open-Meteo OMM/ECMWF) · Pase el cursor para inspeccionar';
         } else if (state.syncMode === 'fallback') {
           txt.textContent = 'Línea base oficial (Offline)';
           modeLbl.textContent = 'Línea base oficial SENAMHI de respaldo (sin conexión)';
-          histCaption.textContent = 'Serie diaria climatológica de respaldo · Pase el cursor para inspeccionar';
         } else {
           txt.textContent = 'Sincronizando...';
           modeLbl.textContent = 'Consultando Open-Meteo (OMM/ECMWF/NOAA)...';
@@ -2425,69 +3121,101 @@
             if (reg.macro === 'Sierra') return '#4f46e5';
             return '#15803d';
           }
+          case 'seismic': {
+            return '#f1f5f9';
+          }
           default:
             return '#64748b';
         }
       }
 
-      const LAYER_META = {
-        temp: {
-          title: 'Temperatura Actual (°C)',
-          items: [
-            { color: '#b91c1c', label: '≥ 30 °C (Muy cálido)' },
-            { color: '#ea580c', label: '25 – 29.9 °C (Cálido)' },
-            { color: '#eab308', label: '20 – 24.9 °C (Templado)' },
-            { color: '#0284c7', label: '14 – 19.9 °C (Fresco)' },
-            { color: '#1e3a8a', label: '< 14 °C (Frío altoandino)' }
-          ]
-        },
-        alert: {
-          title: 'Nivel de Alerta Oficial',
-          items: [
-            { color: '#dc2626', label: '▲ Rojo · Alarma Extrema' },
-            { color: '#ea580c', label: '◆ Naranja · Peligro / Fuerte' },
-            { color: '#eab308', label: '■ Amarillo · Precaución' },
-            { color: '#16a34a', label: '● Verde · Condición Normal' }
-          ]
-        },
-        uv: {
-          title: 'Índice de Radiación UV',
-          items: [
-            { color: '#7e22ce', label: '≥ 11 · Riesgo Extremo' },
-            { color: '#dc2626', label: '8 – 10 · Riesgo Muy Alto' },
-            { color: '#ea580c', label: '6 – 7 · Riesgo Alto' },
-            { color: '#eab308', label: '≤ 5 · Moderado / Bajo' }
-          ]
-        },
-        rain: {
-          title: 'Precipitación 24 h (mm)',
-          items: [
-            { color: '#1e3a8a', label: '≥ 20 mm (Intensa)' },
-            { color: '#1d4ed8', label: '10 – 19.9 mm (Moderada)' },
-            { color: '#38bdf8', label: '3 – 9.9 mm (Ligera)' },
-            { color: '#bae6fd', label: '0.1 – 2.9 mm (Llovizna)' },
-            { color: '#e2e8f0', label: '0 mm (Sin lluvia)' }
-          ]
-        },
-        macro: {
-          title: 'Regiones Naturales',
-          items: [
-            { color: '#d97706', label: 'Costa (Desierto / Litoral)' },
-            { color: '#4f46e5', label: 'Sierra (Cordillera Andina)' },
-            { color: '#15803d', label: 'Selva (Amazonía Alta/Baja)' }
-          ]
-        }
-      };
+      function getLayerMeta(layer) {
+        const u = tempUnitLabel();
+        const isF = state.tempUnit === 'F';
+        const metaMap = {
+          temp: {
+            title: `Temperatura Actual (${u})`,
+            items: isF ? [
+              { color: '#b91c1c', label: '≥ 86 °F (Muy cálido)' },
+              { color: '#ea580c', label: '77 – 85.8 °F (Cálido)' },
+              { color: '#eab308', label: '68 – 76.8 °F (Templado)' },
+              { color: '#0284c7', label: '57.2 – 67.8 °F (Fresco)' },
+              { color: '#1e3a8a', label: '< 57.2 °F (Frío altoandino)' }
+            ] : [
+              { color: '#b91c1c', label: '≥ 30 °C (Muy cálido)' },
+              { color: '#ea580c', label: '25 – 29.9 °C (Cálido)' },
+              { color: '#eab308', label: '20 – 24.9 °C (Templado)' },
+              { color: '#0284c7', label: '14 – 19.9 °C (Fresco)' },
+              { color: '#1e3a8a', label: '< 14 °C (Frío altoandino)' }
+            ]
+          },
+          alert: {
+            title: 'Nivel de Alerta Oficial',
+            items: [
+              { color: '#dc2626', label: '▲ Rojo · Alarma Extrema' },
+              { color: '#ea580c', label: '◆ Naranja · Peligro / Fuerte' },
+              { color: '#eab308', label: '■ Amarillo · Precaución' },
+              { color: '#16a34a', label: '● Verde · Condición Normal' }
+            ]
+          },
+          uv: {
+            title: 'Índice de Radiación UV',
+            items: [
+              { color: '#7e22ce', label: '≥ 11 · Riesgo Extremo' },
+              { color: '#dc2626', label: '8 – 10 · Riesgo Muy Alto' },
+              { color: '#ea580c', label: '6 – 7 · Riesgo Alto' },
+              { color: '#eab308', label: '≤ 5 · Moderado / Bajo' }
+            ]
+          },
+          rain: {
+            title: 'Precipitación 24 h (mm)',
+            items: [
+              { color: '#1e3a8a', label: '≥ 20 mm (Intensa)' },
+              { color: '#1d4ed8', label: '10 – 19.9 mm (Moderada)' },
+              { color: '#38bdf8', label: '3 – 9.9 mm (Ligera)' },
+              { color: '#bae6fd', label: '0.1 – 2.9 mm (Llovizna)' },
+              { color: '#e2e8f0', label: '0 mm (Sin lluvia)' }
+            ]
+          },
+          macro: {
+            title: 'Regiones Naturales',
+            items: [
+              { color: '#d97706', label: 'Costa (Desierto / Litoral)' },
+              { color: '#4f46e5', label: 'Sierra (Cordillera Andina)' },
+              { color: '#15803d', label: 'Selva (Amazonía Alta/Baja)' }
+            ]
+          },
+          seismic: {
+            title: 'Actividad Sísmica (Profundidad)',
+            items: [
+              { color: '#dc2626', label: 'Superficial (< 60 km)' },
+              { color: '#ea580c', label: 'Intermedio (60 – 300 km)' },
+              { color: '#2563eb', label: 'Profundo (> 300 km)' }
+            ],
+            note: 'Tamaño del círculo proporcional a la magnitud (M). Fuente: USGS · Ref. IGP-CENSIS.'
+          }
+        };
+        return metaMap[layer];
+      }
 
       function renderLegend() {
-        const meta = LAYER_META[state.activeLayer];
+        const meta = getLayerMeta(state.activeLayer);
         const el = document.getElementById('mapLegend');
+        const noteHtml = meta.note ? `<div class="legend-note">${meta.note}</div>` : '';
         el.innerHTML = `<div class="legend-title">${meta.title}</div>` +
           meta.items.map(it =>
             `<div class="legend-item"><span class="legend-swatch" style="background:${it.color}"></span><span>${it.label}</span></div>`
-          ).join('');
-        document.getElementById('mapLayerSubtitle').textContent =
-          `Capa activa: ${meta.title} · Haga clic en una jurisdicción para inspeccionar`;
+          ).join('') +
+          noteHtml;
+        const titleEl = document.getElementById('mapPanelTitle');
+        if (titleEl) {
+          titleEl.textContent = state.activeLayer === 'seismic'
+            ? 'Mapa Geográfico de Actividad Sísmica'
+            : 'Mapa Geográfico de Vigilancia Climática';
+        }
+        document.getElementById('mapLayerSubtitle').textContent = state.activeLayer === 'seismic'
+          ? 'Epicentros USGS en vivo · Tamaño por magnitud (M) y color por profundidad focal · Haga clic para inspeccionar'
+          : `Capa activa: ${meta.title} · Haga clic en una jurisdicción para inspeccionar`;
       }
 
       // =========================================================================
@@ -2507,7 +3235,7 @@
             <div style="font-weight:700; font-size:0.84rem; margin-bottom:2px;">${reg.name} (${reg.capital})</div>
             <div style="color:#cbd5e1; font-size:0.72rem; margin-bottom:5px;">${reg.dz} · ${reg.macro}</div>
             <div style="font-family:var(--font-mono); font-size:0.75rem;">
-              T° Actual: <strong>${reg.temp.toFixed(1)} °C</strong> (${reg.tmin.toFixed(1)}/${reg.tmax.toFixed(1)})<br/>
+              T° Actual: <strong>${formatTemp(reg.temp)}</strong> (${formatTempVal(reg.tmin)}/${formatTempVal(reg.tmax)})<br/>
               UV Máx: <strong>${reg.uv}</strong> · Lluvia 24h: <strong>${reg.rain24h.toFixed(1)} mm</strong><br/>
               Alerta: <strong>${reg.alertGlyph} ${reg.alertLevel}</strong>
             </div>
@@ -2565,15 +3293,22 @@
               onEachFeature: (feature, layer) => {
                 const norm = normalizeDepName(feature.properties && feature.properties.NOMBDEP);
                 state.featureById[norm] = layer;
+                const initReg = state.regions.find(r => r.id === norm);
+                if (initReg) {
+                  layer.bindTooltip(tooltipHtml(initReg), { className: 'peru-tooltip', sticky: true });
+                }
                 layer.on({
                   click: () => {
+                    if (state.activeLayer === 'seismic') return;
                     const found = state.regions.find(r => r.id === norm);
                     if (found) selectRegion(found.id, false);
                   },
                   mouseover: () => {
+                    if (state.activeLayer === 'seismic') return;
                     layer.setStyle({ weight: 2.5, color: '#0b1f3a', fillOpacity: 0.88 });
                   },
                   mouseout: () => {
+                    if (state.activeLayer === 'seismic') return;
                     if (state.geoJsonLayer) state.geoJsonLayer.resetStyle(layer);
                   }
                 });
@@ -2599,6 +3334,15 @@
         const reg = state.regions.find(r => r.id === norm);
         const visible = reg ? matchesFilter(reg) : true;
         const isSelected = reg && reg.id === state.selectedId;
+        if (state.activeLayer === 'seismic') {
+          return {
+            fillColor: '#f1f5f9',
+            weight: 1.0,
+            opacity: 0.9,
+            color: '#94a3b8',
+            fillOpacity: 0.55
+          };
+        }
         return {
           fillColor: getLayerColor(reg, state.activeLayer),
           weight: isSelected ? 2.8 : 1.1,
@@ -2622,7 +3366,10 @@
             fillOpacity: 0.88
           });
           marker.bindTooltip(tooltipHtml(reg), { className: 'peru-tooltip', direction: 'top' });
-          marker.on('click', () => selectRegion(reg.id, false));
+          marker.on('click', () => {
+            if (state.activeLayer === 'seismic') return;
+            selectRegion(reg.id, false);
+          });
           marker.addTo(state.markersLayer);
           state.markerById[reg.id] = marker;
         });
@@ -2658,47 +3405,115 @@
           [-79.1, -4.5], [-80.3, -3.4]
         ].map(p => `${projX(p[0]).toFixed(1)},${projY(p[1]).toFixed(1)}`).join(' ');
 
+        const isSeismic = state.activeLayer === 'seismic';
+
         const nodes = state.regions.map(reg => {
           const cx = projX(reg.lon);
           const cy = projY(reg.lat);
           const visible = matchesFilter(reg);
           const isSel = reg.id === state.selectedId;
           const color = getLayerColor(reg, state.activeLayer);
-          const opacity = visible ? 1 : 0.22;
+          const opacity = isSeismic ? 0.35 : (visible ? 1 : 0.22);
           return `
             <g class="svg-reg-node" data-id="${reg.id}" style="cursor:pointer; opacity:${opacity}">
-              <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isSel ? 12 : 9}" fill="${color}" stroke="${isSel ? '#0b1f3a' : '#ffffff'}" stroke-width="${isSel ? 3 : 1.5}"></circle>
-              <text x="${(cx + 12).toFixed(1)}" y="${(cy + 4).toFixed(1)}" font-size="10.5" font-weight="${isSel ? '700' : '600'}" fill="#0f172a">${reg.name === 'Callao (Prov. Const.)' ? 'Callao' : reg.name} (${reg.temp.toFixed(0)}°)</text>
-              <title>${reg.name} (${reg.capital}) — ${reg.temp.toFixed(1)} °C · Alerta ${reg.alertLevel}</title>
+              <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isSeismic ? 4.5 : (isSel ? 12 : 9)}" fill="${isSeismic ? '#94a3b8' : color}" stroke="${isSel && !isSeismic ? '#0b1f3a' : '#ffffff'}" stroke-width="${isSel && !isSeismic ? 3 : 1.5}"></circle>
+              ${isSeismic ? '' : `<text x="${(cx + 12).toFixed(1)}" y="${(cy + 4).toFixed(1)}" font-size="10.5" font-weight="${isSel ? '700' : '600'}" fill="#0f172a">${reg.name === 'Callao (Prov. Const.)' ? 'Callao' : reg.name} (${convertTemp(reg.temp).toFixed(0)}°${state.tempUnit})</text>`}
+              <title>${reg.name} (${reg.capital}) — ${formatTemp(reg.temp)} · Alerta ${reg.alertLevel}</title>
             </g>
           `;
         }).join('');
+
+        let seismicNodes = '';
+        if (isSeismic && state.seismicEvents.length) {
+          const ordered = [...state.seismicEvents].sort((a, b) => b.mag - a.mag);
+          seismicNodes = ordered.map(eq => {
+            const cx = projX(eq.lon);
+            const cy = projY(eq.lat);
+            const cls = classifyDepth(eq.depth);
+            const r = seismicRadius(eq.mag);
+            const isSel = eq.id === state.selectedSeismicId;
+            return `
+              <g class="svg-seis-node" data-seis-id="${escapeHtml(eq.id)}" style="cursor:pointer;">
+                <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${cls.color}" fill-opacity="0.78" stroke="${isSel ? '#0b1f3a' : '#ffffff'}" stroke-width="${isSel ? 2.6 : 1.4}"></circle>
+                <title>M ${eq.mag.toFixed(1)} · ${eq.depth.toFixed(1)} km (${cls.shortLabel}) — ${escapeHtml(eq.place)} · ${formatPeruDateTime(eq.time)}</title>
+              </g>
+            `;
+          }).join('');
+        }
 
         svgBox.innerHTML = `
           <svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="max-height:640px;">
             <rect x="0" y="0" width="${W}" height="${H}" fill="#eef4fa"></rect>
             <polygon points="${peruCoastAndBorders}" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"></polygon>
             ${nodes}
+            ${seismicNodes}
           </svg>
         `;
 
         svgBox.querySelectorAll('.svg-reg-node').forEach(node => {
           node.addEventListener('click', () => {
+            if (state.activeLayer === 'seismic') return;
             selectRegion(node.getAttribute('data-id'), false);
           });
+        });
+
+        svgBox.querySelectorAll('.svg-seis-node').forEach(node => {
+          node.addEventListener('click', () => {
+            focusSeismicEvent(node.getAttribute('data-seis-id'), false);
+          });
+        });
+      }
+
+      function renderSeismicMapLayer() {
+        if (!state.leafletMap || typeof window.L === 'undefined') return;
+        if (state.seismicLayer) {
+          state.seismicLayer.eachLayer(l => {
+            if (l.closeTooltip) l.closeTooltip();
+          });
+          state.leafletMap.removeLayer(state.seismicLayer);
+          state.seismicLayer = null;
+        }
+        state.seismicMarkerById = {};
+        if (state.activeLayer !== 'seismic') return;
+
+        state.seismicLayer = window.L.layerGroup().addTo(state.leafletMap);
+        const ordered = [...state.seismicEvents].sort((a, b) => b.mag - a.mag);
+        ordered.forEach(eq => {
+          const cls = classifyDepth(eq.depth);
+          const isSel = eq.id === state.selectedSeismicId;
+          const marker = window.L.circleMarker([eq.lat, eq.lon], {
+            radius: seismicRadius(eq.mag),
+            fillColor: cls.color,
+            color: isSel ? '#0b1f3a' : '#ffffff',
+            weight: isSel ? 2.8 : 1.6,
+            opacity: 1,
+            fillOpacity: isSel ? 0.94 : 0.78
+          });
+          marker.bindTooltip(seismicTooltipHtml(eq), { className: 'peru-tooltip', direction: 'top' });
+          marker.on('click', () => focusSeismicEvent(eq.id, false));
+          marker.addTo(state.seismicLayer);
+          state.seismicMarkerById[eq.id] = marker;
         });
       }
 
       function refreshMapStyles() {
         renderLegend();
+        const isSeismic = state.activeLayer === 'seismic';
         if (state.mapEngine === 'geojson' && state.geoJsonLayer) {
           state.geoJsonLayer.eachLayer(layer => {
             const norm = normalizeDepName(layer.feature.properties && layer.feature.properties.NOMBDEP);
             const reg = state.regions.find(r => r.id === norm);
             state.geoJsonLayer.resetStyle(layer);
+            const el = layer.getElement && layer.getElement();
+            if (el) el.style.pointerEvents = isSeismic ? 'none' : '';
             if (reg) {
-              layer.unbindTooltip();
-              layer.bindTooltip(tooltipHtml(reg), { className: 'peru-tooltip', sticky: true });
+              if (isSeismic) {
+                if (layer.closeTooltip) layer.closeTooltip();
+              } else if (layer.getTooltip && layer.getTooltip()) {
+                layer.setTooltipContent(tooltipHtml(reg));
+              } else {
+                layer.bindTooltip(tooltipHtml(reg), { className: 'peru-tooltip', sticky: true });
+              }
             }
           });
           // Actualiza también overlay de Callao
@@ -2706,28 +3521,44 @@
             const reg = state.regions.find(r => r.id === id);
             const m = state.markerById[id];
             if (reg && m) {
+              const el = m.getElement && m.getElement();
+              if (el) el.style.pointerEvents = isSeismic ? 'none' : '';
               m.setStyle({
-                fillColor: getLayerColor(reg, state.activeLayer),
-                radius: id === state.selectedId ? 8 : 6,
-                fillOpacity: matchesFilter(reg) ? 0.92 : 0.2
+                fillColor: isSeismic ? '#cbd5e1' : getLayerColor(reg, state.activeLayer),
+                radius: isSeismic ? 4 : (id === state.selectedId ? 8 : 6),
+                fillOpacity: isSeismic ? 0.35 : (matchesFilter(reg) ? 0.92 : 0.2),
+                opacity: isSeismic ? 0.4 : 1
               });
-              m.setTooltipContent(tooltipHtml(reg));
+              if (isSeismic) {
+                if (m.closeTooltip) m.closeTooltip();
+              } else if (m.getTooltip && m.getTooltip()) {
+                m.setTooltipContent(tooltipHtml(reg));
+              }
             }
           });
+          renderSeismicMapLayer();
         } else if (state.mapEngine === 'markers') {
           Object.keys(state.markerById).forEach(id => {
             const reg = state.regions.find(r => r.id === id);
             const m = state.markerById[id];
             if (reg && m) {
+              const el = m.getElement && m.getElement();
+              if (el) el.style.pointerEvents = isSeismic ? 'none' : '';
               m.setStyle({
-                fillColor: getLayerColor(reg, state.activeLayer),
-                radius: id === state.selectedId ? 12 : 8.5,
-                weight: id === state.selectedId ? 2.5 : 1.5,
-                fillOpacity: matchesFilter(reg) ? 0.9 : 0.2
+                fillColor: isSeismic ? '#cbd5e1' : getLayerColor(reg, state.activeLayer),
+                radius: isSeismic ? 4.5 : (id === state.selectedId ? 12 : 8.5),
+                weight: isSeismic ? 1 : (id === state.selectedId ? 2.5 : 1.5),
+                fillOpacity: isSeismic ? 0.35 : (matchesFilter(reg) ? 0.9 : 0.2),
+                opacity: isSeismic ? 0.4 : 1
               });
-              m.setTooltipContent(tooltipHtml(reg));
+              if (isSeismic) {
+                if (m.closeTooltip) m.closeTooltip();
+              } else if (m.getTooltip && m.getTooltip()) {
+                m.setTooltipContent(tooltipHtml(reg));
+              }
             }
           });
+          renderSeismicMapLayer();
         } else if (state.mapEngine === 'svg') {
           renderSvgFallbackMap();
         }
@@ -2747,9 +3578,9 @@
         const nCount = alerted.filter(r => r.alertRank === 3).length;
         const aCount = alerted.filter(r => r.alertRank === 2).length;
 
-        document.getElementById('kpiCostaTemp').textContent = `${avg(costa).toFixed(1)} °C`;
-        document.getElementById('kpiSierraTemp').textContent = `${avg(sierra).toFixed(1)} °C`;
-        document.getElementById('kpiSelvaTemp').textContent = `${avg(selva).toFixed(1)} °C`;
+        document.getElementById('kpiCostaTemp').textContent = formatTemp(avg(costa));
+        document.getElementById('kpiSierraTemp').textContent = formatTemp(avg(sierra));
+        document.getElementById('kpiSelvaTemp').textContent = formatTemp(avg(selva));
         document.getElementById('kpiAlertCount').textContent = `${alerted.length} / 25`;
         document.getElementById('kpiAlertBreakdown').textContent = `${rCount}R · ${nCount}N · ${aCount}A`;
       }
@@ -2767,9 +3598,9 @@
         badge.className = `alert-tag alert-${reg.alertLevel}`;
         badge.textContent = `${reg.alertGlyph} ${reg.alertLevel} · ${reg.alertDesc}`;
 
-        document.getElementById('metTemp').innerHTML = `${reg.temp.toFixed(1)}<span class="metric-unit">°C</span>`;
+        document.getElementById('metTemp').innerHTML = `${formatTempVal(reg.temp)}<span class="metric-unit">${tempUnitLabel()}</span>`;
         document.getElementById('metCond').textContent = weatherCodeLabel(reg.code);
-        document.getElementById('metMinMax').innerHTML = `${reg.tmin.toFixed(1)} / ${reg.tmax.toFixed(1)}<span class="metric-unit">°C</span>`;
+        document.getElementById('metMinMax').innerHTML = `${formatTempVal(reg.tmin)} / ${formatTempVal(reg.tmax)}<span class="metric-unit">${tempUnitLabel()}</span>`;
         document.getElementById('metHum').innerHTML = `${reg.hum}<span class="metric-unit">%</span>`;
         document.getElementById('metPress').textContent = `Presión: ${reg.press} hPa`;
         document.getElementById('metRain').innerHTML = `${reg.rain24h.toFixed(1)}<span class="metric-unit">mm</span>`;
@@ -2820,9 +3651,10 @@
         const plotW = W - pad.left - pad.right;
         const plotH = H - pad.top - pad.bottom;
 
-        const allTemps = data.flatMap(d => [d.tmin, d.tmax]);
-        const minT = Math.floor(Math.min(...allTemps) - 2);
-        const maxT = Math.ceil(Math.max(...allTemps) + 2);
+        const allTemps = data.flatMap(d => [convertTemp(d.tmin), convertTemp(d.tmax)]);
+        const marginT = state.tempUnit === 'F' ? 4 : 2;
+        const minT = Math.floor(Math.min(...allTemps) - marginT);
+        const maxT = Math.ceil(Math.max(...allTemps) + marginT);
         const maxRain = Math.max(10, Math.ceil(Math.max(...data.map(d => d.rain)) * 1.25));
 
         const xFor = i => pad.left + (i / Math.max(1, data.length - 1)) * plotW;
@@ -2857,12 +3689,12 @@
         }).join('');
 
         // Banda térmica entre Tmín y Tmáx
-        const polyTop = data.map((d, i) => `${xFor(i).toFixed(1)},${yTemp(d.tmax).toFixed(1)}`);
-        const polyBot = [...data].reverse().map((d, i) => `${xFor(data.length - 1 - i).toFixed(1)},${yTemp(d.tmin).toFixed(1)}`);
+        const polyTop = data.map((d, i) => `${xFor(i).toFixed(1)},${yTemp(convertTemp(d.tmax)).toFixed(1)}`);
+        const polyBot = [...data].reverse().map((d, i) => `${xFor(data.length - 1 - i).toFixed(1)},${yTemp(convertTemp(d.tmin)).toFixed(1)}`);
         const bandSvg = `<polygon points="${polyTop.concat(polyBot).join(' ')}" fill="#94a3b8" opacity="0.14"></polygon>`;
 
-        const maxPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(d.tmax).toFixed(1)}`).join(' ');
-        const minPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(d.tmin).toFixed(1)}`).join(' ');
+        const maxPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(convertTemp(d.tmax)).toFixed(1)}`).join(' ');
+        const minPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(convertTemp(d.tmin)).toFixed(1)}`).join(' ');
 
         const xLabels = data.map((d, i) => {
           const shortDate = d.date.slice(5).replace('-', '/');
@@ -2873,8 +3705,8 @@
         const pointsAndHits = data.map((d, i) => {
           const cx = xFor(i);
           return `
-            <circle cx="${cx.toFixed(1)}" cy="${yTemp(d.tmax).toFixed(1)}" r="3.8" fill="#dc2626" stroke="#ffffff" stroke-width="1.2"></circle>
-            <circle cx="${cx.toFixed(1)}" cy="${yTemp(d.tmin).toFixed(1)}" r="3.8" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"></circle>
+            <circle cx="${cx.toFixed(1)}" cy="${yTemp(convertTemp(d.tmax)).toFixed(1)}" r="3.8" fill="#dc2626" stroke="#ffffff" stroke-width="1.2"></circle>
+            <circle cx="${cx.toFixed(1)}" cy="${yTemp(convertTemp(d.tmin)).toFixed(1)}" r="3.8" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"></circle>
             <rect class="chart7d-hit" data-idx="${i}" x="${(cx - plotW / (data.length * 2)).toFixed(1)}" y="${pad.top}" width="${(plotW / data.length).toFixed(1)}" height="${plotH}" fill="transparent" style="cursor:crosshair"></rect>
           `;
         }).join('');
@@ -2904,8 +3736,8 @@
           }
           readout.innerHTML = `
             <span><strong>${d.date}</strong></span>
-            <span>Tmáx: <strong style="color:#dc2626;">${d.tmax.toFixed(1)} °C</strong></span>
-            <span>Tmín: <strong style="color:#2563eb;">${d.tmin.toFixed(1)} °C</strong></span>
+            <span>Tmáx: <strong style="color:#dc2626;">${formatTemp(d.tmax)}</strong></span>
+            <span>Tmín: <strong style="color:#2563eb;">${formatTemp(d.tmin)}</strong></span>
             <span>Lluvia: <strong style="color:#0369a1;">${d.rain.toFixed(1)} mm</strong></span>
             <span>UV Máx: <strong>${d.uv}</strong></span>
           `;
@@ -2921,7 +3753,7 @@
         const wrap = document.getElementById('chartMonthlyWrap');
         const readout = document.getElementById('chartMonthlyReadout');
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
-        const temps = reg.monthlyTemp;
+        const temps = reg.monthlyTemp.map(convertTemp);
         const rains = reg.monthlyRain;
 
         const W = 470, H = 250;
@@ -2929,8 +3761,9 @@
         const plotW = W - pad.left - pad.right;
         const plotH = H - pad.top - pad.bottom;
 
-        const minT = Math.floor(Math.min(...temps) - 2);
-        const maxT = Math.ceil(Math.max(...temps) + 2);
+        const marginT = state.tempUnit === 'F' ? 4 : 2;
+        const minT = Math.floor(Math.min(...temps) - marginT);
+        const maxT = Math.ceil(Math.max(...temps) + marginT);
         const maxR = Math.max(20, Math.ceil(Math.max(...rains) * 1.15));
 
         const xFor = i => pad.left + ((i + 0.5) / 12) * plotW;
@@ -2980,7 +3813,7 @@
         const showMonth = i => {
           readout.innerHTML = `
             <span><strong>Normal ${months[i]} (${reg.name})</strong></span>
-            <span>T° Media: <strong>${temps[i].toFixed(1)} °C</strong></span>
+            <span>T° Media: <strong>${temps[i].toFixed(1)} ${tempUnitLabel()}</strong></span>
             <span>Precipitación normal: <strong style="color:#0369a1;">${rains[i]} mm</strong></span>
           `;
         };
@@ -3053,8 +3886,8 @@
             </td>
             <td>${reg.macro}</td>
             <td class="tabular">DZ ${reg.dzNum}</td>
-            <td class="num tabular"><strong>${reg.temp.toFixed(1)} °C</strong></td>
-            <td class="num tabular">${reg.tmin.toFixed(1)} / ${reg.tmax.toFixed(1)} °C</td>
+            <td class="num tabular"><strong>${formatTemp(reg.temp)}</strong></td>
+            <td class="num tabular">${formatTempVal(reg.tmin)} / ${formatTempVal(reg.tmax)} ${tempUnitLabel()}</td>
             <td class="num tabular">${reg.rain24h.toFixed(1)} mm</td>
             <td class="num tabular">${reg.uv}</td>
             <td>
@@ -3151,8 +3984,9 @@
         doc.setTextColor(15, 23, 42);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(9.5);
-        doc.text(`Temp. Actual: ${reg.temp.toFixed(1)} C (${weatherCodeLabel(reg.code)})`, 18, y + 8);
-        doc.text(`Min / Max 24h: ${reg.tmin.toFixed(1)} / ${reg.tmax.toFixed(1)} C`, 108, y + 8);
+        const unitSym = state.tempUnit;
+        doc.text(`Temp. Actual: ${formatTempVal(reg.temp)} ${unitSym} (${weatherCodeLabel(reg.code)})`, 18, y + 8);
+        doc.text(`Min / Max 24h: ${formatTempVal(reg.tmin)} / ${formatTempVal(reg.tmax)} ${unitSym}`, 108, y + 8);
         doc.text(`Humedad: ${reg.hum}%  |  Presion: ${reg.press} hPa`, 18, y + 15);
         doc.text(`Precipitacion 24h: ${reg.rain24h.toFixed(1)} mm`, 108, y + 15);
         doc.text(`Indice UV Max: ${reg.uv} (${uvRiskCategory(reg.uv)})`, 18, y + 22);
@@ -3194,8 +4028,8 @@
         doc.setFontSize(8.5);
         doc.setTextColor(15, 23, 42);
         doc.text('Fecha', 18, y + 5);
-        doc.text('T. Min (C)', 62, y + 5);
-        doc.text('T. Max (C)', 98, y + 5);
+        doc.text(`T. Min (${unitSym})`, 62, y + 5);
+        doc.text(`T. Max (${unitSym})`, 98, y + 5);
         doc.text('Lluvia (mm)', 134, y + 5);
         doc.text('UV Max', 172, y + 5);
         y += 7;
@@ -3207,8 +4041,8 @@
             doc.rect(14, y, 182, 6.2, 'F');
           }
           doc.text(d.date, 18, y + 4.5);
-          doc.text(d.tmin.toFixed(1), 62, y + 4.5);
-          doc.text(d.tmax.toFixed(1), 98, y + 4.5);
+          doc.text(formatTempVal(d.tmin), 62, y + 4.5);
+          doc.text(formatTempVal(d.tmax), 98, y + 4.5);
           doc.text(d.rain.toFixed(1), 134, y + 4.5);
           doc.text(String(d.uv), 172, y + 4.5);
           y += 6.2;
@@ -3247,7 +4081,8 @@
         doc.text(`Estado de datos: ${state.syncMode === 'live' ? 'Sincronizacion en vivo Open-Meteo + SENAMHI' : 'Linea base oficial SENAMHI'}`, 14, 24);
 
         // Resumen Macro-regional
-        const avg = arr => (arr.reduce((s, r) => s + r.temp, 0) / Math.max(1, arr.length)).toFixed(1);
+        const unitSym = state.tempUnit;
+        const avg = arr => formatTempVal(arr.reduce((s, r) => s + r.temp, 0) / Math.max(1, arr.length));
         const costaAvg = avg(state.regions.filter(r => r.macro === 'Costa'));
         const sierraAvg = avg(state.regions.filter(r => r.macro === 'Sierra'));
         const selvaAvg = avg(state.regions.filter(r => r.macro === 'Selva'));
@@ -3257,7 +4092,7 @@
         doc.setTextColor(15, 23, 42);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10);
-        doc.text(`Promedios Nacionales: Costa ${costaAvg} C  |  Sierra ${sierraAvg} C  |  Selva ${selvaAvg} C  |  Bajo aviso: ${alertedCount}/25`, 14, y);
+        doc.text(`Promedios Nacionales: Costa ${costaAvg} ${unitSym}  |  Sierra ${sierraAvg} ${unitSym}  |  Selva ${selvaAvg} ${unitSym}  |  Bajo aviso: ${alertedCount}/25`, 14, y);
 
         // Tabla de las 25 jurisdicciones
         y += 7;
@@ -3285,8 +4120,8 @@
           doc.text(r.name.slice(0, 22), 16, y + 4.4);
           doc.text(r.macro, 56, y + 4.4);
           doc.text(`DZ ${r.dzNum}`, 74, y + 4.4);
-          doc.text(`${r.temp.toFixed(1)} C`, 90, y + 4.4);
-          doc.text(`${r.tmin.toFixed(0)}/${r.tmax.toFixed(0)} C`, 108, y + 4.4);
+          doc.text(`${formatTempVal(r.temp)} ${unitSym}`, 90, y + 4.4);
+          doc.text(`${formatTempVal(r.tmin, 0)}/${formatTempVal(r.tmax, 0)} ${unitSym}`, 108, y + 4.4);
           doc.text(`${r.rain24h.toFixed(1)} mm`, 132, y + 4.4);
           doc.text(String(r.uv), 150, y + 4.4);
           doc.text(r.alertLevel, 164, y + 4.4);
@@ -3340,13 +4175,17 @@
       }
 
       function bindEvents() {
-        // Pestañas de capas temáticas
+        // Pestañas principales de módulo (Condiciones Meteorológicas / Actividad Sísmica)
+        document.querySelectorAll('.module-tab[data-module]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            switchModule(btn.getAttribute('data-module'));
+          });
+        });
+
+        // Pestañas de capas climáticas exclusivas
         document.querySelectorAll('.layer-tab[data-layer]').forEach(btn => {
           btn.addEventListener('click', () => {
-            document.querySelectorAll('.layer-tab[data-layer]').forEach(b => b.setAttribute('aria-pressed', 'false'));
-            btn.setAttribute('aria-pressed', 'true');
-            state.activeLayer = btn.getAttribute('data-layer');
-            refreshMapStyles();
+            activateClimateLayer(btn.getAttribute('data-layer'));
           });
         });
 
@@ -3395,9 +4234,28 @@
           }
         });
 
-        // Botón Actualizar
+        // Interruptor de unidad de temperatura (°C / °F)
+        document.getElementById('btnUnitC').addEventListener('click', () => setTempUnit('C'));
+        document.getElementById('btnUnitF').addEventListener('click', () => setTempUnit('F'));
+
+        // Botón Actualizar contextual por módulo
         document.getElementById('btnRefresh').addEventListener('click', () => {
-          fetchLiveTelemetry(true);
+          if (state.activeModule === 'seismic') {
+            fetchSeismicActivity(true);
+          } else {
+            fetchLiveTelemetry(true);
+          }
+        });
+
+        // Módulo de Actividad Sísmica
+        document.getElementById('btnRefreshSeismic').addEventListener('click', () => {
+          fetchSeismicActivity(true);
+        });
+
+        document.getElementById('btnFocusLatestSeismic').addEventListener('click', () => {
+          if (state.seismicEvents.length) {
+            focusSeismicEvent(state.seismicEvents[0].id, true);
+          }
         });
 
         // Botones de descarga PDF
@@ -3406,16 +4264,619 @@
       }
 
       // =========================================================================
-      // 13. ARRANQUE DE LA APLICACIÓN
+      // 13. MÓDULO DE ACTIVIDAD SÍSMICA (USGS GEOJSON + RESPALDO IGP-CENSIS)
+      // =========================================================================
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function classifyDepth(depthKm) {
+        const d = Number(depthKm) || 0;
+        if (d < 60) {
+          return { key: 'shallow', label: 'Superficial (<60 km)', shortLabel: 'Superficial', color: '#dc2626', cssClass: 'depth-shallow' };
+        }
+        if (d <= 300) {
+          return { key: 'intermediate', label: 'Intermedio (60–300 km)', shortLabel: 'Intermedio', color: '#ea580c', cssClass: 'depth-intermediate' };
+        }
+        return { key: 'deep', label: 'Profundo (>300 km)', shortLabel: 'Profundo', color: '#2563eb', cssClass: 'depth-deep' };
+      }
+
+      function seismicRadius(mag) {
+        const m = Math.max(1.5, Number(mag) || 2.5);
+        return Math.max(5.5, Math.min(22, 3.0 + m * 2.65));
+      }
+
+      function formatPeruDateTime(epochMs) {
+        const d = new Date(epochMs);
+        const formatted = new Intl.DateTimeFormat('es-PE', {
+          timeZone: 'America/Lima',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        }).format(d);
+        return `${formatted} PET`;
+      }
+
+      function formatRelativeTimeEs(epochMs) {
+        const diffSec = Math.max(0, Math.floor((Date.now() - epochMs) / 1000));
+        if (diffSec < 60) return 'hace unos segundos';
+        const mins = Math.floor(diffSec / 60);
+        if (mins < 60) return `hace ${mins} min`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `hace ${hrs} h`;
+        const days = Math.floor(hrs / 24);
+        return `hace ${days} d`;
+      }
+
+      function seismicTooltipHtml(eq) {
+        const cls = classifyDepth(eq.depth);
+        return `
+          <div style="min-width:195px; max-width:260px;">
+            <div style="font-weight:700; font-size:0.86rem; margin-bottom:3px;">
+              Sismo M ${eq.mag.toFixed(1)} · <span style="color:#fca5a5;">${cls.shortLabel}</span>
+            </div>
+            <div style="color:#e2e8f0; font-size:0.75rem; margin-bottom:5px; white-space:normal;">${escapeHtml(eq.place)}</div>
+            <div style="font-family:var(--font-mono); font-size:0.73rem; color:#cbd5e1;">
+              Profundidad: <strong style="color:#ffffff;">${eq.depth.toFixed(1)} km</strong> (${cls.label})<br/>
+              Fecha PET: <strong style="color:#ffffff;">${formatPeruDateTime(eq.time)}</strong><br/>
+              Coord: ${eq.lat.toFixed(2)}°, ${eq.lon.toFixed(2)}°
+            </div>
+          </div>
+        `;
+      }
+
+      function applyModuleVisibility() {
+        const isSeismic = state.activeModule === 'seismic';
+
+        document.querySelectorAll('.module-tab[data-module]').forEach(tab => {
+          tab.setAttribute('aria-selected', tab.getAttribute('data-module') === state.activeModule ? 'true' : 'false');
+        });
+
+        const showIds = isSeismic
+          ? ['seismicDossier', 'seismicSection']
+          : ['climateSubBar', 'tempUnitToggle', 'btnPdfNational', 'climateKpiGrid', 'regionalDossier', 'historicalChartsSection', 'bulletinsSection', 'nationalTableSection'];
+
+        const hideIds = isSeismic
+          ? ['climateSubBar', 'tempUnitToggle', 'btnPdfNational', 'climateKpiGrid', 'regionalDossier', 'historicalChartsSection', 'bulletinsSection', 'nationalTableSection']
+          : ['seismicDossier', 'seismicSection'];
+
+        showIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (id === 'tempUnitToggle' || id === 'btnPdfNational') {
+            el.style.display = 'inline-flex';
+          } else if (id === 'climateKpiGrid') {
+            el.style.display = 'grid';
+          } else if (id === 'climateSubBar') {
+            el.style.display = 'block';
+          } else {
+            el.style.display = 'flex';
+          }
+        });
+
+        hideIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+      }
+
+      function switchModule(moduleKey) {
+        const nextModule = moduleKey === 'seismic' ? 'seismic' : 'climate';
+        state.activeModule = nextModule;
+        state.activeLayer = nextModule === 'seismic' ? 'seismic' : state.activeClimateLayer;
+
+        if (nextModule === 'seismic' && state.seismicEvents.length) {
+          const exists = state.seismicEvents.some(e => e.id === state.selectedSeismicId);
+          if (!exists) {
+            state.selectedSeismicId = state.seismicEvents[0].id;
+          }
+        }
+
+        applyModuleVisibility();
+        updateSyncUI();
+        refreshMapStyles();
+
+        if (nextModule === 'seismic') {
+          renderSeismicDossier();
+          renderSeismicSection();
+        } else {
+          renderAll();
+        }
+
+        if (state.leafletMap) {
+          requestAnimationFrame(() => {
+            if (state.leafletMap) state.leafletMap.invalidateSize();
+          });
+        }
+      }
+
+      function activateClimateLayer(layerKey) {
+        if (!layerKey || layerKey === 'seismic') return;
+        state.activeClimateLayer = layerKey;
+        document.querySelectorAll('.layer-tab[data-layer]').forEach(btn => {
+          btn.setAttribute('aria-pressed', btn.getAttribute('data-layer') === layerKey ? 'true' : 'false');
+        });
+        if (state.activeModule !== 'climate') {
+          switchModule('climate');
+        } else {
+          state.activeLayer = layerKey;
+          refreshMapStyles();
+        }
+      }
+
+      function buildFallbackSeismicEvents() {
+        const now = Date.now();
+        return SEISMIC_FALLBACK.map(item => ({
+          id: item.id,
+          mag: item.mag,
+          place: item.place,
+          depth: item.depth,
+          lat: item.lat,
+          lon: item.lon,
+          time: now - item.offsetHours * 3600 * 1000,
+          url: item.url,
+          tsunami: 0,
+          isLive: false
+        }));
+      }
+
+      function normalizeUsgsFeatures(features) {
+        return features
+          .filter(f => f && f.geometry && Array.isArray(f.geometry.coordinates) && f.properties)
+          .map(f => ({
+            id: String(f.id || Math.random()),
+            mag: f.properties.mag != null ? Number(f.properties.mag) : 0,
+            place: f.properties.place || 'Territorio peruano / Margen pacífico',
+            time: Number(f.properties.time) || Date.now(),
+            lon: Number(f.geometry.coordinates[0]),
+            lat: Number(f.geometry.coordinates[1]),
+            depth: f.geometry.coordinates[2] != null ? Math.max(0, Number(f.geometry.coordinates[2])) : 10,
+            url: typeof f.properties.url === 'string' && f.properties.url.startsWith('https://') ? f.properties.url : 'https://ultimosismo.igp.gob.pe',
+            tsunami: Number(f.properties.tsunami) || 0,
+            isLive: true
+          }))
+          .sort((a, b) => b.time - a.time);
+      }
+
+      function updateSeismicSyncUI() {
+        const pill = document.getElementById('seismicStatusPill');
+        const dot = document.getElementById('seismicSyncDot');
+        const txt = document.getElementById('seismicSyncText');
+        const lastEl = document.getElementById('seismicLastSync');
+
+        pill.className = 'seismic-status-pill ' + (state.seismicSyncMode === 'live' ? 'live' : state.seismicSyncMode === 'fallback' ? 'fallback' : '');
+        dot.className = 'sync-dot ' + state.seismicSyncMode;
+
+        if (state.seismicSyncMode === 'live') {
+          txt.textContent = 'En vivo USGS GeoJSON';
+        } else if (state.seismicSyncMode === 'fallback') {
+          txt.textContent = 'Respaldo referencial IGP/USGS';
+        } else {
+          txt.textContent = 'Consultando USGS...';
+        }
+        lastEl.textContent = state.seismicLastSync || '--';
+        const tabCountEl = document.getElementById('tabSeismicCount');
+        if (tabCountEl && state.seismicEvents.length) {
+          tabCountEl.textContent = String(state.seismicEvents.length);
+        }
+        if (state.activeModule === 'seismic') {
+          updateSyncUI();
+        }
+      }
+
+      function renderSeismicSection() {
+        const events = state.seismicEvents;
+        const tbody = document.getElementById('seismicTableBody');
+
+        if (!events.length) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:22px; color:var(--text-muted);">Sin eventos sísmicos disponibles en este momento.</td></tr>';
+          return;
+        }
+
+        const latest = events[0];
+        const maxEv = events.reduce((best, cur) => (cur.mag > best.mag ? cur : best), events[0]);
+        const shallowCnt = events.filter(e => e.depth < 60).length;
+        const interCnt = events.filter(e => e.depth >= 60 && e.depth <= 300).length;
+        const deepCnt = events.filter(e => e.depth > 300).length;
+
+        document.getElementById('seisLatestMag').textContent = `M ${latest.mag.toFixed(1)} · ${latest.depth.toFixed(0)} km`;
+        document.getElementById('seisLatestPlace').textContent = `${latest.place} (${formatRelativeTimeEs(latest.time)})`;
+        document.getElementById('seisMaxMag').textContent = `M ${maxEv.mag.toFixed(1)} · ${maxEv.depth.toFixed(0)} km`;
+        document.getElementById('seisMaxPlace').textContent = maxEv.place;
+        document.getElementById('seisShallowCount').textContent = `${shallowCnt} / ${events.length}`;
+        document.getElementById('seisDepthDist').textContent = `${shallowCnt}S · ${interCnt}I · ${deepCnt}P`;
+
+        tbody.innerHTML = events.map(eq => {
+          const cls = classifyDepth(eq.depth);
+          const magClass = eq.mag >= 5.5 ? 'mag-high' : eq.mag >= 4.5 ? 'mag-mod' : 'mag-low';
+          const isSel = eq.id === state.selectedSeismicId;
+          const tsunamiBadge = eq.tsunami ? '<span class="depth-badge depth-shallow" style="margin-left:6px;">Aviso Tsunami</span>' : '';
+          return `
+            <tr class="${isSel ? 'selected-seismic-row' : ''}" data-seis-id="${escapeHtml(eq.id)}">
+              <td>
+                <span class="mag-badge ${magClass}">M ${eq.mag.toFixed(1)}</span>
+              </td>
+              <td>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <strong class="tabular">${eq.depth.toFixed(1)} km</strong>
+                  <span class="depth-badge ${cls.cssClass}">${cls.shortLabel}</span>
+                </div>
+              </td>
+              <td style="white-space:normal; min-width:240px;">
+                <div class="dept-cell-main">${escapeHtml(eq.place)}${tsunamiBadge}</div>
+                <div class="dept-cell-sub tabular">${eq.lat.toFixed(2)}°, ${eq.lon.toFixed(2)}°</div>
+              </td>
+              <td>
+                <div class="tabular" style="font-weight:600; color:var(--text-primary);">${formatPeruDateTime(eq.time)}</div>
+                <div class="dept-cell-sub">${formatRelativeTimeEs(eq.time)}</div>
+              </td>
+              <td class="num">
+                <div style="display:inline-flex; align-items:center; gap:8px;">
+                  <button type="button" class="btn btn-outline btn-focus-seis" data-seis-id="${escapeHtml(eq.id)}" style="height:28px; padding:0 9px; font-size:0.74rem;">
+                    Ubicar
+                  </button>
+                  <a href="${escapeHtml(eq.url)}" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem; font-weight:600; color:var(--navy-800); text-decoration:none;">
+                    ${eq.isLive ? 'USGS ↗' : 'IGP ↗'}
+                  </a>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        tbody.querySelectorAll('tr[data-seis-id]').forEach(row => {
+          row.addEventListener('click', e => {
+            if (e.target.closest('a')) return;
+            focusSeismicEvent(row.getAttribute('data-seis-id'), true);
+          });
+        });
+
+        tbody.querySelectorAll('.btn-focus-seis').forEach(btn => {
+          btn.addEventListener('click', e => {
+            e.stopPropagation();
+            focusSeismicEvent(btn.getAttribute('data-seis-id'), true);
+          });
+        });
+      }
+
+      function haversineKm(lat1, lon1, lat2, lon2) {
+        const toRad = deg => (deg * Math.PI) / 180;
+        const R = 6371;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      }
+
+      function findNearestDepartmentalCapitals(lat, lon) {
+        if (!state.regions.length) return [];
+        return state.regions
+          .map(reg => ({
+            reg,
+            distKm: haversineKm(lat, lon, reg.lat, reg.lon)
+          }))
+          .sort((a, b) => a.distKm - b.distKm);
+      }
+
+      function classifyMagnitudeLabel(mag) {
+        if (mag >= 7.0) return 'Terremoto mayor (≥ 7.0)';
+        if (mag >= 6.0) return 'Sismo fuerte (6.0 – 6.9)';
+        if (mag >= 5.0) return 'Sismo moderado a fuerte (5.0 – 5.9)';
+        if (mag >= 4.0) return 'Sismo moderado (4.0 – 4.9)';
+        return 'Sismo leve (< 4.0)';
+      }
+
+      function evaluateSeismicPerceptionAndCoen(eq, nearest) {
+        const distKm = nearest ? nearest.distKm : 150;
+        const depth = Number(eq.depth) || 0;
+        const mag = Number(eq.mag) || 0;
+
+        let depthFactor = 0;
+        let tectonicNote = '';
+        if (depth < 60) {
+          depthFactor = 0.0;
+          tectonicNote = 'Sismo superficial (< 60 km) de la zona sismogénica interplaca o falla cortical continental; libera energía sísmica con menor atenuación hacia la superficie.';
+        } else if (depth <= 300) {
+          depthFactor = -0.5;
+          tectonicNote = 'Sismo de profundidad intermedia (60–300 km) asociado a la subducción de la placa de Nazca (zona de Wadati-Benioff); perceptible en un radio amplio pero con sacudimiento atenuado.';
+        } else {
+          depthFactor = -1.35;
+          tectonicNote = 'Sismo de foco profundo (> 300 km) en el manto subducido bajo la Amazonía; la gran distancia hipocentral atenúa drásticamente las ondas sísmicas antes de alcanzar la superficie.';
+        }
+
+        let distAdj = 0;
+        if (distKm <= 60) distAdj = 0.3;
+        else if (distKm > 250) distAdj = -1.2;
+        else if (distKm > 120) distAdj = -0.6;
+
+        const score = mag + depthFactor + distAdj;
+        const coastalRisk = nearest && nearest.reg.macro === 'Costa' && mag >= 6.0 && depth < 70;
+        const tsunamiAlert = eq.tsunami === 1 || coastalRisk;
+
+        if (score >= 5.8) {
+          return {
+            alertClass: 'alert-Rojo',
+            perceptionShort: 'Fuerte a Muy Fuerte',
+            perceptionMmi: 'MMI VI – VII (Estimada)',
+            tectonicNote,
+            impactText: 'Sacudimiento intenso esperado en localidades cercanas al epicentro con posible caída de objetos, fisuras en muros no confinados y alarma generalizada.',
+            tsunamiText: tsunamiAlert
+              ? 'ATENCIÓN LITORAL: Verifique de inmediato los boletines oficiales de tsunami de DIHIDRONAV (dhn.mil.pe) y COEN-INDECI.'
+              : 'Sin indicador activo de tsunami en el registro; mantenga monitoreo oficial por canales de INDECI.',
+            recommendations: [
+              'COEN-INDECI (Acción Inmediata): Evacúe hacia zonas seguras externas tras cesar el movimiento y aléjese de fachadas, postes o laderas inestables.',
+              'Verificación de Servicios: Revise posibles fugas de gas, cortes eléctricos y daños estructurales antes de reingresar a edificaciones.',
+              'Preparación ante Réplicas: Mantenga lista la mochila de emergencia, linterna, radio a pilas y siga los comunicados oficiales de IGP-CENSIS e INDECI.'
+            ]
+          };
+        }
+
+        if (score >= 4.7) {
+          return {
+            alertClass: 'alert-Naranja',
+            perceptionShort: 'Moderada a Fuerte',
+            perceptionMmi: 'MMI IV – V (Estimada)',
+            tectonicNote,
+            impactText: 'Vibración perceptible por la mayoría de la población en áreas próximas al epicentro, oscilación de lámparas y crujido leve de ventanas.',
+            tsunamiText: tsunamiAlert
+              ? 'ATENCIÓN LITORAL: Verifique boletines oceanográficos de DIHIDRONAV (dhn.mil.pe).'
+              : 'No se prevé generación de tsunami por las características hipocentrales actuales.',
+            recommendations: [
+              'COEN-INDECI (Vigilancia): Conserve la calma, ubíquese en zonas seguras internas (columnas o muros estructurales) durante el sismo y evite ascensores.',
+              'Mochila de Emergencia: Verifique que la mochila para las primeras 24 horas y la caja de reserva cuenten con agua, botiquín y documentos.',
+              'Información Oficial: Contraste reportes con el Centro Sismológico Nacional (IGP - ultimosismo.igp.gob.pe) y evite difundir rumores.'
+            ]
+          };
+        }
+
+        if (score >= 3.6) {
+          return {
+            alertClass: 'alert-Amarillo',
+            perceptionShort: 'Leve',
+            perceptionMmi: 'MMI II – III (Estimada)',
+            tectonicNote,
+            impactText: 'Percepción ligera en reposo o pisos elevados de edificaciones cercanas; sin afectación estructural esperada.',
+            tsunamiText: 'Sin riesgo de tsunami asociado a este evento.',
+            recommendations: [
+              'COEN-INDECI (Prevención): Refuerce el Plan Familiar de Emergencia y asegure repisas, televisores u objetos pesados en dormitorios y pasadizos.',
+              'Monitoreo Continuo: Consulte la ficha oficial del evento en IGP - CENSIS (ultimosismo.igp.gob.pe) para confirmación instrumental nacional.'
+            ]
+          };
+        }
+
+        return {
+          alertClass: 'alert-Verde',
+          perceptionShort: 'Imperceptible / Leve',
+          perceptionMmi: 'MMI I – II (Estimada)',
+          tectonicNote,
+          impactText: 'Evento registrado por instrumentación geofísica con percepción mínima o nula en superficie debido a su magnitud y/o atenuación focal.',
+          tsunamiText: 'Sin riesgo de tsunami asociado a este evento.',
+          recommendations: [
+            'COEN-INDECI (Rutina): Mantenga despejadas las rutas de evacuación del hogar y centro laboral en todo momento.',
+            'Referencia Oficial: Seguimiento sismológico permanente a cargo del IGP (ultimosismo.igp.gob.pe) y COEN-INDECI (gob.pe/indeci).'
+          ]
+        };
+      }
+
+      function renderSeismicDossier() {
+        const regDossier = document.getElementById('regionalDossier');
+        const seisDossier = document.getElementById('seismicDossier');
+        if (!regDossier || !seisDossier) return;
+
+        if (state.activeLayer !== 'seismic') {
+          seisDossier.style.display = 'none';
+          regDossier.style.display = 'flex';
+          return;
+        }
+
+        regDossier.style.display = 'none';
+        seisDossier.style.display = 'flex';
+
+        if (!state.seismicEvents.length) return;
+        let eq = state.seismicEvents.find(e => e.id === state.selectedSeismicId);
+        if (!eq) {
+          eq = state.seismicEvents[0];
+          state.selectedSeismicId = eq.id;
+        }
+
+        const cls = classifyDepth(eq.depth);
+        const capitals = findNearestDepartmentalCapitals(eq.lat, eq.lon);
+        const nearest = capitals[0] || null;
+        const secondNearest = capitals[1] || null;
+        const evalData = evaluateSeismicPerceptionAndCoen(eq, nearest);
+
+        document.getElementById('seisDosPlace').textContent = eq.place;
+        document.getElementById('seisDosSource').textContent = eq.isLive ? 'USGS GeoJSON (En vivo)' : 'Catálogo Referencial IGP/USGS';
+        document.getElementById('seisDosNearestShort').textContent = nearest
+          ? `${nearest.distKm.toFixed(1)} km de ${nearest.reg.capital}`
+          : '--';
+
+        const badge = document.getElementById('seisDosDepthBadge');
+        const badgeGlyph = cls.key === 'shallow' ? '▲' : cls.key === 'intermediate' ? '◆' : '●';
+        const badgeLevelClass = cls.key === 'shallow' ? 'alert-Rojo' : cls.key === 'intermediate' ? 'alert-Naranja' : 'alert-Verde';
+        badge.className = `alert-tag ${badgeLevelClass}`;
+        badge.textContent = `${badgeGlyph} ${cls.label}`;
+
+        const linkEl = document.getElementById('seisDosSourceLink');
+        linkEl.href = eq.url || 'https://ultimosismo.igp.gob.pe';
+        linkEl.textContent = eq.isLive ? 'Ver evento en USGS ↗' : 'Ir a IGP-CENSIS ↗';
+
+        document.getElementById('seisDosMag').textContent = `M ${eq.mag.toFixed(1)}`;
+        document.getElementById('seisDosMagNote').textContent = classifyMagnitudeLabel(eq.mag);
+
+        document.getElementById('seisDosDepth').innerHTML = `${eq.depth.toFixed(1)}<span class="metric-unit">km</span>`;
+        document.getElementById('seisDosDepthClass').textContent = cls.label;
+
+        document.getElementById('seisDosCoords').textContent = `${eq.lat.toFixed(3)}°, ${eq.lon.toFixed(3)}°`;
+        document.getElementById('seisDosTimePet').textContent = formatPeruDateTime(eq.time).replace(' PET', '');
+        document.getElementById('seisDosTimeRel').textContent = `Hora Oficial PET (UTC-5) · ${formatRelativeTimeEs(eq.time)}`;
+
+        if (nearest) {
+          document.getElementById('seisDosDist').innerHTML = `${nearest.distKm.toFixed(1)}<span class="metric-unit">km</span>`;
+          document.getElementById('seisDosDistTarget').textContent = `a ${nearest.reg.capital} (${nearest.reg.name} · ${nearest.reg.dz})`;
+        } else {
+          document.getElementById('seisDosDist').textContent = '--';
+          document.getElementById('seisDosDistTarget').textContent = '--';
+        }
+
+        document.getElementById('seisDosPerception').textContent = evalData.perceptionShort;
+        document.getElementById('seisDosPerceptionNote').textContent = evalData.perceptionMmi;
+
+        document.getElementById('seisDosEventId').textContent = `ID: ${eq.id}`;
+
+        const proximityDetail = nearest
+          ? ` Distancia geodésica más cercana: ${nearest.distKm.toFixed(1)} km respecto a ${nearest.reg.capital} (${nearest.reg.name})${secondNearest ? ` y ${secondNearest.distKm.toFixed(1)} km respecto a ${secondNearest.reg.capital} (${secondNearest.reg.name})` : ''}.`
+          : '';
+        document.getElementById('seisDosTectonic').textContent = evalData.tectonicNote + proximityDetail;
+        document.getElementById('seisDosImpact').textContent = `${evalData.impactText} ${evalData.tsunamiText}`;
+
+        const coenListEl = document.getElementById('seisDosCoenList');
+        coenListEl.innerHTML = evalData.recommendations.map(rec => {
+          const splitIdx = rec.indexOf(':');
+          if (splitIdx > 0) {
+            return `<div class="mini-bulletin"><strong>${escapeHtml(rec.slice(0, splitIdx + 1))}</strong>${escapeHtml(rec.slice(splitIdx + 1))}</div>`;
+          }
+          return `<div class="mini-bulletin">${escapeHtml(rec)}</div>`;
+        }).join('') +
+        `<div class="mini-bulletin"><strong>Enlaces Institucionales:</strong> <a href="https://ultimosismo.igp.gob.pe" target="_blank" rel="noopener noreferrer" style="color:var(--navy-800); font-weight:600;">IGP - CENSIS</a> · <a href="https://www.gob.pe/indeci" target="_blank" rel="noopener noreferrer" style="color:var(--navy-800); font-weight:600;">COEN - INDECI</a> · <a href="https://www.dhn.mil.pe" target="_blank" rel="noopener noreferrer" style="color:var(--navy-800); font-weight:600;">DIHIDRONAV</a></div>`;
+      }
+
+      function focusSeismicEvent(id, scrollAndFly = true) {
+        const eq = state.seismicEvents.find(item => item.id === id);
+        if (!eq) return;
+        state.selectedSeismicId = eq.id;
+
+        if (state.activeModule !== 'seismic') {
+          switchModule('seismic');
+        } else {
+          refreshMapStyles();
+          renderSeismicDossier();
+          renderSeismicSection();
+        }
+
+        if (scrollAndFly) {
+          const mapPanel = document.getElementById('leafletMap').closest('.panel');
+          if (mapPanel) mapPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (state.leafletMap) {
+            state.leafletMap.flyTo([eq.lat, eq.lon], 7, { duration: 0.55 });
+            setTimeout(() => {
+              const liveMarker = state.seismicMarkerById[eq.id];
+              if (liveMarker && state.leafletMap && state.leafletMap.hasLayer(liveMarker)) {
+                liveMarker.openTooltip();
+              }
+            }, 450);
+          }
+        }
+      }
+
+      async function fetchSeismicActivity(force = false) {
+        const lima = getLimaNowParts();
+
+        if (!force) {
+          try {
+            const raw = localStorage.getItem(SEISMIC_STORAGE_KEY);
+            if (raw) {
+              const cached = JSON.parse(raw);
+              const ageMs = Date.now() - (cached.timestamp || 0);
+              if (ageMs < 15 * 60 * 1000 && Array.isArray(cached.events) && cached.events.length) {
+                state.seismicEvents = cached.events;
+                if (!state.selectedSeismicId || String(state.selectedSeismicId).startsWith('IGP-REF-')) {
+                  state.selectedSeismicId = cached.events[0].id;
+                }
+                state.seismicSyncMode = 'live';
+                state.seismicLastSync = cached.syncTimeStr;
+                updateSeismicSyncUI();
+                renderSeismicSection();
+                renderSeismicDossier();
+                refreshMapStyles();
+                return;
+              }
+            }
+          } catch (_) {}
+        }
+
+        state.seismicSyncMode = 'loading';
+        updateSeismicSyncUI();
+
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 10000);
+          const resp = await fetch(USGS_SEISMIC_URL, { signal: controller.signal });
+          clearTimeout(timer);
+
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          if (!data || !Array.isArray(data.features)) throw new Error('GeoJSON sísmico inválido');
+
+          const events = normalizeUsgsFeatures(data.features);
+          if (!events.length) throw new Error('Sin eventos en la respuesta');
+
+          const syncNow = getLimaNowParts();
+          state.seismicEvents = events;
+          if (!state.selectedSeismicId || String(state.selectedSeismicId).startsWith('IGP-REF-') || !events.some(e => e.id === state.selectedSeismicId)) {
+            state.selectedSeismicId = events[0].id;
+          }
+          state.seismicSyncMode = 'live';
+          state.seismicLastSync = `${syncNow.displayDate}, ${syncNow.timeStr} PET`;
+
+          try {
+            localStorage.setItem(SEISMIC_STORAGE_KEY, JSON.stringify({
+              timestamp: Date.now(),
+              syncTimeStr: state.seismicLastSync,
+              events
+            }));
+          } catch (_) {}
+
+          updateSeismicSyncUI();
+          renderSeismicSection();
+          renderSeismicDossier();
+          refreshMapStyles();
+          if (force) showToast(`Actividad sísmica actualizada (${events.length} eventos USGS).`);
+        } catch (err) {
+          state.seismicEvents = buildFallbackSeismicEvents();
+          if (!state.selectedSeismicId || !state.seismicEvents.some(e => e.id === state.selectedSeismicId)) {
+            state.selectedSeismicId = state.seismicEvents[0].id;
+          }
+          state.seismicSyncMode = 'fallback';
+          state.seismicLastSync = `${lima.displayDate}, ${lima.timeStr} PET (Respaldo IGP/USGS)`;
+          updateSeismicSyncUI();
+          renderSeismicSection();
+          renderSeismicDossier();
+          refreshMapStyles();
+          if (force) showToast('Sin conexión a USGS: mostrando catálogo referencial IGP/CENSIS.');
+        }
+      }
+
+      // =========================================================================
+      // 14. ARRANQUE DE LA APLICACIÓN
       // =========================================================================
       function boot() {
+        syncTempUnitUI();
         hydrateRegions(null, false);
+        state.seismicEvents = buildFallbackSeismicEvents();
+        state.selectedSeismicId = state.seismicEvents[0].id;
         bindEvents();
+        applyModuleVisibility();
         updateLimaClock();
         setInterval(updateLimaClock, 1000);
         renderAll();
+        renderSeismicSection();
+        renderSeismicDossier();
+        updateSeismicSyncUI();
+        updateSyncUI();
         initCartography();
         fetchLiveTelemetry(false);
+        fetchSeismicActivity(false);
       }
 
       if (document.readyState === 'loading') {
