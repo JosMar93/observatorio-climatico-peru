@@ -1,0 +1,8 @@
+{
+  "name": "Remix Observatorio Climático Nacional del Perú",
+  "description": "Plataforma geoespacial y meteorológica operativa de las 25 regiiones del Perú con telemetría en vivo Open-Meteo, clasificación climática SENAMHI, series históricas, alertas en tiempo real y reportes en PDF.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

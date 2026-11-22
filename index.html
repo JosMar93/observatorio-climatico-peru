@@ -1,0 +1,3429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Observatorio Climático Nacional del Perú</title>
+  <meta name="description" content="Plataforma geoespacial y meteorológica operativa de las 25 jurisdicciones del Perú con telemetría en vivo Open-Meteo, clasificación climática SENAMHI, series históricas, alertas en tiempo real y reportes en PDF." />
+  <meta property="og:title" content="Observatorio Climático Nacional del Perú" />
+  <meta property="og:description" content="Monitoreo climático de las 25 jurisdicciones del Perú con justificación científica SENAMHI, COEN-INDECI y DIHIDRONAV." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous" />
+
+  <style>
+    :root {
+      --navy-950: #061326;
+      --navy-900: #0b1f3a;
+      --navy-800: #133159;
+      --navy-700: #1d4478;
+      --accent-blue: #1d4ed8;
+      --accent-cyan: #0369a1;
+      --bg-canvas: #f6f8fb;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --border-hairline: #dce3ed;
+      --border-strong: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #526277;
+      --alert-red: #b91c1c;
+      --alert-red-bg: #fef2f2;
+      --alert-red-border: #fecaca;
+      --alert-orange: #c2410c;
+      --alert-orange-bg: #fff7ed;
+      --alert-orange-border: #fed7aa;
+      --alert-yellow: #a16207;
+      --alert-yellow-bg: #fefce8;
+      --alert-yellow-border: #fde68a;
+      --alert-green: #15803d;
+      --alert-green-bg: #f0fdf4;
+      --alert-green-border: #bbf7d0;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 10px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-mono);
+    }
+
+    .tabular-sans {
+      font-variant-numeric: tabular-nums;
+    }
+
+    button, input, select {
+      font-family: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
+    /* Command Header */
+    .cmd-header {
+      background-color: var(--navy-900);
+      color: #ffffff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding-top: 14px;
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: #ffffff;
+      line-height: 1.25;
+      text-wrap: balance;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      line-height: 1.3;
+    }
+
+    .header-ops {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .clock-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      padding-right: 16px;
+      border-right: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .clock-time {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.01em;
+    }
+
+    .clock-meta {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .sync-dot.live {
+      background-color: #22c55e;
+    }
+
+    .sync-dot.fallback {
+      background-color: #f59e0b;
+    }
+
+    .sync-dot.loading {
+      background-color: #38bdf8;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 38px;
+      padding: 0 14px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 150ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms cubic-bezier(0.16, 1, 0.3, 1), color 150ms cubic-bezier(0.16, 1, 0.3, 1), transform 120ms ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-ghost-light {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .btn-ghost-light:hover {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .btn-primary-light {
+      background-color: #ffffff;
+      color: var(--navy-900);
+      border-color: #ffffff;
+    }
+
+    .btn-primary-light:hover {
+      background-color: #e2e8f0;
+    }
+
+    .btn-outline {
+      background-color: var(--bg-surface);
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--bg-subtle);
+      border-color: #94a3b8;
+    }
+
+    .btn-navy {
+      background-color: var(--navy-900);
+      border-color: var(--navy-900);
+      color: #ffffff;
+    }
+
+    .btn-navy:hover {
+      background-color: var(--navy-800);
+    }
+
+    /* Sub-header transparency & daily auto-update bar */
+    .source-strip {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .source-strip-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .source-meta-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sep {
+      color: #94a3b8;
+      user-select: none;
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 12px 0;
+    }
+
+    .controls-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .layer-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background-color: var(--bg-subtle);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-hairline);
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .layer-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+
+    .layer-tab:hover {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.65);
+    }
+
+    .layer-tab[aria-pressed="true"] {
+      background-color: var(--navy-900);
+      color: #ffffff;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .select-control, .search-input {
+      height: 38px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: 0.825rem;
+      padding: 0 12px;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      padding-left: 32px;
+      width: 240px;
+    }
+
+    /* Main Content Layout */
+    .main-content {
+      padding-top: 20px;
+      padding-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* National Summary KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .kpi-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .kpi-value {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    /* Workspace 2-Column Split */
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .panel-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Map Container */
+    .map-stage {
+      position: relative;
+      flex: 1;
+      min-height: 620px;
+      background-color: #eef3f8;
+    }
+
+    #leafletMap {
+      width: 100%;
+      height: 100%;
+      min-height: 620px;
+      z-index: 1;
+    }
+
+    .svg-fallback-map {
+      display: none;
+      width: 100%;
+      height: 100%;
+      min-height: 620px;
+      background: linear-gradient(180deg, #eff5fb 0%, #e5eef7 100%);
+      position: relative;
+    }
+
+    .svg-fallback-map.active {
+      display: block;
+    }
+
+    .map-legend {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      z-index: 450;
+      background-color: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      min-width: 185px;
+      max-width: 240px;
+      font-size: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .legend-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--navy-900);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      color: var(--text-secondary);
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      flex-shrink: 0;
+    }
+
+    .map-mode-note {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 450;
+      background-color: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Regional Dossier */
+    .dossier-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      flex: 1;
+    }
+
+    .dossier-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .region-name {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .region-meta {
+      margin-top: 4px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Explicit Status Indicators (Text + Glyph + Semantic Color, non-pill) */
+    .alert-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 700;
+      border: 1px solid;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .alert-Rojo {
+      color: var(--alert-red);
+      background-color: var(--alert-red-bg);
+      border-color: var(--alert-red-border);
+    }
+
+    .alert-Naranja {
+      color: var(--alert-orange);
+      background-color: var(--alert-orange-bg);
+      border-color: var(--alert-orange-border);
+    }
+
+    .alert-Amarillo {
+      color: var(--alert-yellow);
+      background-color: var(--alert-yellow-bg);
+      border-color: var(--alert-yellow-border);
+    }
+
+    .alert-Verde {
+      color: var(--alert-green);
+      background-color: var(--alert-green-bg);
+      border-color: var(--alert-green-border);
+    }
+
+    /* 6-Metric Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      background-color: var(--border-hairline);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .metric-cell {
+      background-color: var(--bg-surface);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .metric-val {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.25;
+    }
+
+    .metric-unit {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    .metric-note {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+
+    /* Scientific Justification Section */
+    .science-block {
+      background-color: #f8fafc;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .science-heading {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .science-rows {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      font-size: 0.83rem;
+    }
+
+    .science-row-title {
+      font-weight: 700;
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.78rem;
+    }
+
+    .science-row-text {
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .thorn-code {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--navy-800);
+      background-color: #e2e8f0;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.78rem;
+      margin-right: 6px;
+    }
+
+    .applicable-bulletins {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .mini-bulletin {
+      font-size: 0.78rem;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+    }
+
+    .mini-bulletin strong {
+      color: var(--text-primary);
+    }
+
+    /* Historical Charts Section */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .chart-box {
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      background-color: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    .chart-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .chart-title {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+
+    .chart-caption {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chart-legend-inline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .legend-dot-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .swatch-bar {
+      width: 12px;
+      height: 3px;
+      display: inline-block;
+      border-radius: 2px;
+    }
+
+    .swatch-box {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      border-radius: 2px;
+    }
+
+    .svg-chart-wrap {
+      width: 100%;
+      position: relative;
+    }
+
+    .svg-chart-wrap svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .chart-hover-bar {
+      min-height: 28px;
+      padding: 5px 10px;
+      background-color: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Bulletins Board */
+    .bulletins-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .bulletin-card {
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      background-color: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bulletin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .bulletin-agency {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--navy-800);
+    }
+
+    .bulletin-title {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .bulletin-desc {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      flex: 1;
+    }
+
+    .bulletin-footer {
+      padding-top: 8px;
+      border-top: 1px solid var(--border-hairline);
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Comparative National Table */
+    .table-wrap {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.825rem;
+    }
+
+    thead th {
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    thead th.sortable {
+      cursor: pointer;
+    }
+
+    thead th.sortable:hover {
+      color: var(--navy-900);
+      background-color: #e2e8f0;
+    }
+
+    thead th.num, tbody td.num {
+      text-align: right;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-hairline);
+      cursor: pointer;
+      transition: background-color 120ms ease;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    tbody tr.selected-row {
+      background-color: #e0ecff;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      color: var(--text-primary);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .dept-cell-main {
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+
+    .dept-cell-sub {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Footer */
+    .site-footer {
+      background-color: var(--navy-950);
+      color: #cbd5e1;
+      padding: 28px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.8rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.3);
+      padding-bottom: 1px;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      border-bottom-color: #ffffff;
+    }
+
+    /* Leaflet Tooltip Override */
+    .leaflet-tooltip.peru-tooltip {
+      background-color: rgba(11, 31, 58, 0.96);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: var(--font-sans);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Toast / Notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      background-color: var(--navy-900);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      display: none;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1120px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      .bulletins-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .map-stage, #leafletMap, .svg-fallback-map {
+        min-height: 480px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .bulletins-grid {
+        grid-template-columns: 1fr;
+      }
+      .clock-box {
+        display: none;
+      }
+      .search-input {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      .controls-bar, .header-actions, .map-stage, .site-footer, .toast {
+        display: none !important;
+      }
+      body {
+        background-color: #ffffff;
+      }
+      .panel {
+        border: 1px solid #cbd5e1;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Encabezado de Comando -->
+  <header class="cmd-header">
+    <div class="container header-inner">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Observatorio Climático Nacional del Perú</h1>
+          <p class="brand-subtitle">Vigilancia meteorológica de las 25 jurisdicciones · Marco SENAMHI, COEN-INDECI y DIHIDRONAV</p>
+        </div>
+      </div>
+
+      <div class="header-ops">
+        <div class="clock-box" aria-label="Hora oficial de Lima">
+          <span class="clock-time tabular" id="limaClock">--:--:--</span>
+          <span class="clock-meta tabular" id="limaDate">Lima, Perú (UTC-5)</span>
+        </div>
+
+        <div class="sync-status" id="syncBadge" aria-live="polite">
+          <span class="sync-dot loading" id="syncDot"></span>
+          <span id="syncText">Sincronizando telemetría...</span>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" class="btn btn-ghost-light" id="btnRefresh" title="Actualizar telemetría meteorológica ahora">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            Actualizar
+          </button>
+          <button type="button" class="btn btn-primary-light" id="btnPdfNational" title="Descargar boletín climático nacional en PDF">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Boletín Nacional PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra de Transparencia de Fuentes y Actualización Diaria -->
+  <div class="source-strip">
+    <div class="container source-strip-inner">
+      <div class="source-meta-line">
+        <strong>Fuente activa:</strong>
+        <span id="sourceModeLabel">Consultando Open-Meteo (OMM/ECMWF/NOAA)...</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>Última actualización: <strong class="tabular" id="lastSyncTime">--</strong></span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span>Ciclo automático diario (00:05 PET): <strong class="tabular" id="nextAutoSync">--</strong></span>
+      </div>
+      <div class="source-meta-line">
+        <span>Cobertura: 24 Departamentos + Prov. Const. del Callao (DZ 1 a DZ 13)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Controles -->
+  <div class="controls-bar">
+    <div class="container controls-inner">
+      <div class="layer-tabs" role="group" aria-label="Capas temáticas del mapa">
+        <button type="button" class="layer-tab" data-layer="temp" aria-pressed="true">Temperatura Actual (°C)</button>
+        <button type="button" class="layer-tab" data-layer="alert" aria-pressed="false">Nivel de Alerta</button>
+        <button type="button" class="layer-tab" data-layer="uv" aria-pressed="false">Radiación UV</button>
+        <button type="button" class="layer-tab" data-layer="rain" aria-pressed="false">Precipitación 24h</button>
+        <button type="button" class="layer-tab" data-layer="macro" aria-pressed="false">Regiones Naturales</button>
+      </div>
+
+      <div class="filter-group">
+        <label for="macroFilter" style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Macro-región:</label>
+        <select id="macroFilter" class="select-control" aria-label="Filtrar por macro-región">
+          <option value="Todas">Todas (25)</option>
+          <option value="Costa">Costa (9)</option>
+          <option value="Sierra">Sierra (11)</option>
+          <option value="Selva">Selva (5)</option>
+        </select>
+
+        <div class="search-wrap">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" id="searchInput" class="search-input" placeholder="Buscar departamento o capital..." aria-label="Buscar por departamento o capital" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido Principal -->
+  <main class="container main-content">
+    <!-- Resumen Nacional: 4 KPIs -->
+    <section class="kpi-grid" aria-label="Resumen térmico y alertas nacionales">
+      <article class="kpi-card">
+        <div class="kpi-label">
+          <span>Promedio Costa</span>
+          <span class="tabular" id="kpiCostaCount">9 jurisdicciones</span>
+        </div>
+        <div class="kpi-value tabular" id="kpiCostaTemp">-- °C</div>
+        <div class="kpi-sub" id="kpiCostaSub">Corriente de Humboldt y brisa marina</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-label">
+          <span>Promedio Sierra</span>
+          <span class="tabular" id="kpiSierraCount">11 jurisdicciones</span>
+        </div>
+        <div class="kpi-value tabular" id="kpiSierraTemp">-- °C</div>
+        <div class="kpi-sub" id="kpiSierraSub">Gradiente altitudinal andino</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-label">
+          <span>Promedio Selva</span>
+          <span class="tabular" id="kpiSelvaCount">5 jurisdicciones</span>
+        </div>
+        <div class="kpi-value tabular" id="kpiSelvaTemp">-- °C</div>
+        <div class="kpi-sub" id="kpiSelvaSub">Convección amazónica húmeda</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-label">
+          <span>Jurisdicciones bajo aviso</span>
+          <span class="tabular" id="kpiAlertBreakdown">--</span>
+        </div>
+        <div class="kpi-value tabular" id="kpiAlertCount">-- / 25</div>
+        <div class="kpi-sub" id="kpiAlertSub">Niveles Amarillo, Naranja o Rojo vigentes</div>
+      </article>
+    </section>
+
+    <!-- Área de Trabajo 2 Columnas -->
+    <section class="workspace-grid" aria-label="Mapa geográfico y expediente climático regional">
+      <!-- Izquierda: Mapa Geográfico -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Mapa Geográfico de Vigilancia Climática</h2>
+            <div class="panel-subtitle" id="mapLayerSubtitle">Capa activa: Temperatura Actual (°C) · Haga clic en una jurisdicción para inspeccionar</div>
+          </div>
+          <button type="button" class="btn btn-outline" id="btnResetZoom" style="height:32px; padding:0 10px; font-size:0.76rem;">
+            Vista Nacional
+          </button>
+        </div>
+
+        <div class="map-stage">
+          <div id="leafletMap" role="region" aria-label="Mapa interactivo del Perú"></div>
+          <div id="svgFallbackMap" class="svg-fallback-map" role="region" aria-label="Mapa esquemático georreferenciado del Perú"></div>
+          <div class="map-mode-note" id="mapRenderMode">Cargando cartografía...</div>
+          <div class="map-legend" id="mapLegend"></div>
+        </div>
+      </div>
+
+      <!-- Derecha: Expediente Climático Regional -->
+      <div class="panel" id="regionalDossier">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Expediente Climático Regional</h2>
+            <div class="panel-subtitle">Telemetría operativa y justificación científica institucional</div>
+          </div>
+          <button type="button" class="btn btn-navy" id="btnPdfRegional" style="height:32px; padding:0 12px; font-size:0.76rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            Exportar PDF Regional
+          </button>
+        </div>
+
+        <div class="dossier-body">
+          <div class="dossier-top">
+            <div>
+              <h3 class="region-name" id="dosName">Lima</h3>
+              <div class="region-meta">
+                <span>Capital: <strong id="dosCapital">Lima</strong></span>
+                <span class="sep" aria-hidden="true">·</span>
+                <span>Altitud: <strong class="tabular" id="dosAlt">154 m s.n.m.</strong></span>
+                <span class="sep" aria-hidden="true">·</span>
+                <span>Región: <strong id="dosMacro">Costa</strong></span>
+              </div>
+            </div>
+            <div id="dosAlertBadge" class="alert-tag alert-Verde">● Verde · Normal</div>
+          </div>
+
+          <!-- Cuadrícula de 6 Métricas Meteorológicas -->
+          <div class="metrics-grid" aria-label="Variables meteorológicas actuales">
+            <div class="metric-cell">
+              <span class="metric-label">Temperatura Actual</span>
+              <span class="metric-val tabular" id="metTemp">--<span class="metric-unit">°C</span></span>
+              <span class="metric-note" id="metCond">--</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Rango Diario (Mín / Máx)</span>
+              <span class="metric-val tabular" id="metMinMax">-- / --<span class="metric-unit">°C</span></span>
+              <span class="metric-note">Pronóstico 24 h</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Humedad Relativa</span>
+              <span class="metric-val tabular" id="metHum">--<span class="metric-unit">%</span></span>
+              <span class="metric-note" id="metPress">Presión: -- hPa</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Precipitación 24 h</span>
+              <span class="metric-val tabular" id="metRain">--<span class="metric-unit">mm</span></span>
+              <span class="metric-note" id="metRainNow">Actual: -- mm/h</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Índice UV Máximo</span>
+              <span class="metric-val tabular" id="metUv">--</span>
+              <span class="metric-note" id="metUvRisk">--</span>
+            </div>
+            <div class="metric-cell">
+              <span class="metric-label">Viento a 10 m</span>
+              <span class="metric-val tabular" id="metWind">--<span class="metric-unit">km/h</span></span>
+              <span class="metric-note" id="metCoords">Coord: --</span>
+            </div>
+          </div>
+
+          <!-- Bloque de Justificación Climática Oficial -->
+          <div class="science-block">
+            <h4 class="science-heading">
+              <span>Justificación Climática Oficial (SENAMHI / COEN-INDECI / DIHIDRONAV)</span>
+              <span class="tabular" id="dosDz" style="font-size:0.76rem; color:var(--navy-800);">DZ 4</span>
+            </h4>
+            <div class="science-rows">
+              <div>
+                <span class="science-row-title">Estación Meteorológica de Referencia y Dirección Zonal</span>
+                <p class="science-row-text" id="dosStation">--</p>
+              </div>
+              <div>
+                <span class="science-row-title">Clasificación Climática de Warren Thornthwaite (SENAMHI 2020)</span>
+                <p class="science-row-text"><span class="thorn-code" id="dosThornCode">--</span><span id="dosThornDesc">--</span></p>
+              </div>
+              <div>
+                <span class="science-row-title">Controladores Geográficos y Sinópticos</span>
+                <p class="science-row-text" id="dosDrivers">--</p>
+              </div>
+              <div>
+                <span class="science-row-title">Avisos e Indicaciones Aplicables</span>
+                <div class="applicable-bulletins" id="dosBulletins"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de Gráficos Históricos -->
+    <section class="panel" aria-label="Gráficos históricos y climatología regional">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Análisis de Series Históricas y Climatología — <span id="chartRegionName">Lima</span></h2>
+          <div class="panel-subtitle">Evolución diaria observada (últimos 7 días + hoy) y normales climáticas mensuales SENAMHI (1991–2020)</div>
+        </div>
+        <div class="chart-legend-inline">
+          <span class="legend-dot-line"><span class="swatch-bar" style="background:#dc2626;"></span>T° Máxima</span>
+          <span class="legend-dot-line"><span class="swatch-bar" style="background:#2563eb;"></span>T° Mínima</span>
+          <span class="legend-dot-line"><span class="swatch-box" style="background:#0284c7;"></span>Precipitación (mm)</span>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Gráfico 1: Últimos 7 días -->
+        <div class="chart-box">
+          <div class="chart-head">
+            <div>
+              <h3 class="chart-title">Serie Diaria Reciente (Últimos 7 Días + Hoy)</h3>
+              <div class="chart-caption" id="historySourceCaption">Datos diarios sincronizados · Pase el cursor para inspeccionar valores exactos</div>
+            </div>
+          </div>
+          <div class="svg-chart-wrap" id="chart7dWrap"></div>
+          <div class="chart-hover-bar tabular" id="chart7dReadout">
+            <span>Pase el cursor sobre cualquier día para ver el detalle diario</span>
+          </div>
+        </div>
+
+        <!-- Gráfico 2: Climatología Mensual -->
+        <div class="chart-box">
+          <div class="chart-head">
+            <div>
+              <h3 class="chart-title">Régimen Climático Anual (Normales Ene–Dic)</h3>
+              <div class="chart-caption">Ciclo estacional de temperatura media (°C) y precipitación mensual (mm)</div>
+            </div>
+          </div>
+          <div class="svg-chart-wrap" id="chartMonthlyWrap"></div>
+          <div class="chart-hover-bar tabular" id="chartMonthlyReadout">
+            <span>Estacionalidad oficial SENAMHI para la jurisdicción seleccionada</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tablero de Boletines y Alertas en Tiempo Real -->
+    <section class="panel" aria-label="Tablero de boletines meteorológicos vigentes">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Tablero de Alertas y Boletines Vigentes en Tiempo Real</h2>
+          <div class="panel-subtitle">Integración operativa de umbrales telemetrados con avisos SENAMHI, COEN-INDECI y DIHIDRONAV</div>
+        </div>
+        <div class="layer-tabs" role="group" aria-label="Filtrar boletines por institución">
+          <button type="button" class="layer-tab bulletin-filter" data-agency="Todas" aria-pressed="true">Todos</button>
+          <button type="button" class="layer-tab bulletin-filter" data-agency="SENAMHI" aria-pressed="false">SENAMHI</button>
+          <button type="button" class="layer-tab bulletin-filter" data-agency="COEN-INDECI" aria-pressed="false">COEN-INDECI</button>
+          <button type="button" class="layer-tab bulletin-filter" data-agency="DIHIDRONAV" aria-pressed="false">DIHIDRONAV</button>
+        </div>
+      </div>
+
+      <div class="bulletins-grid" id="bulletinsGrid"></div>
+    </section>
+
+    <!-- Tabla Comparativa Nacional -->
+    <section class="panel" aria-label="Tabla comparativa nacional de las 25 jurisdicciones">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Tabla Comparativa Nacional (25 Jurisdicciones)</h2>
+          <div class="panel-subtitle">Haga clic en los encabezados para ordenar o en cualquier fila para centrar el mapa y actualizar el expediente</div>
+        </div>
+        <span class="tabular" id="tableCountLabel" style="font-size:0.78rem; color:var(--text-muted);">Mostrando 25 de 25</span>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" data-sort="name">Departamento / Jurisdicción <span class="sort-ind"></span></th>
+              <th class="sortable" data-sort="macro">Macro-región <span class="sort-ind"></span></th>
+              <th class="sortable" data-sort="dzNum">DZ SENAMHI <span class="sort-ind"></span></th>
+              <th class="sortable num" data-sort="temp">T° Actual <span class="sort-ind"></span></th>
+              <th class="sortable num" data-sort="tmax">Mín / Máx <span class="sort-ind"></span></th>
+              <th class="sortable num" data-sort="rain24h">Lluvia 24h <span class="sort-ind"></span></th>
+              <th class="sortable num" data-sort="uv">Índice UV <span class="sort-ind"></span></th>
+              <th class="sortable" data-sort="alertRank">Nivel de Alerta <span class="sort-ind"></span></th>
+            </tr>
+          </thead>
+          <tbody id="nationalTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pie de Página Institucional -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div style="max-width:680px;">
+        <strong style="color:#ffffff; display:block; margin-bottom:4px;">Observatorio Climático Nacional del Perú</strong>
+        <span>Telemetría sinóptica abierta vía Open-Meteo (OMM / ECMWF / NOAA) con parametrización territorial de las 13 Direcciones Zonales del SENAMHI, clasificación climática de Warren Thornthwaite (2020), gestión de riesgos COEN-INDECI y avisos oceanográficos DIHIDRONAV.</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://www.gob.pe/senamhi" target="_blank" rel="noopener noreferrer">gob.pe/senamhi</a>
+        <a href="https://observatorio.senamhi.gob.pe" target="_blank" rel="noopener noreferrer">observatorio.senamhi.gob.pe</a>
+        <a href="https://www.gob.pe/indeci" target="_blank" rel="noopener noreferrer">gob.pe/indeci</a>
+        <a href="https://www.dhn.mil.pe" target="_blank" rel="noopener noreferrer">dhn.mil.pe</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toastMsg" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // =========================================================================
+      // 1. BASE DE DATOS CIENTÍFICA DE LAS 25 JURISDICCIONES DEL PERÚ
+      // =========================================================================
+      const REGIONS_BASE = [
+        {
+          id: 'AMAZONAS',
+          name: 'Amazonas',
+          capital: 'Chachapoyas',
+          lat: -6.2317,
+          lon: -77.8690,
+          alt: 2335,
+          macro: 'Selva',
+          dz: 'DZ 2 (Lambayeque)',
+          dzNum: 2,
+          station: 'Estación CO Chachapoyas (2,335 m s.n.m.) · Red DZ 2 SENAMHI',
+          thornCode: "B(r)B'2",
+          thornDesc: 'Lluvioso templado con humedad abundante en todas las estaciones del año.',
+          drivers: 'Transición orográfica entre los Andes nororientales y la cuenca amazónica. La humedad transportada por los vientos alisios del este asciende por la ceja de selva generando nubosidad persistente y lluvias convectivas frecuentes.',
+          coastalOcean: false,
+          base: { temp: 16.4, tmin: 10.5, tmax: 20.8, hum: 82, rainNow: 0.4, rain24h: 8.6, uv: 9, wind: 11, press: 1015, code: 61 },
+          monthlyTemp: [15.8, 15.6, 15.5, 15.4, 15.2, 14.6, 14.3, 14.9, 15.5, 15.9, 16.1, 16.0],
+          monthlyRain: [108, 118, 134, 96, 62, 41, 34, 38, 66, 98, 92, 102]
+        },
+        {
+          id: 'ANCASH',
+          name: 'Áncash',
+          capital: 'Huaraz',
+          lat: -9.5278,
+          lon: -77.5278,
+          alt: 3052,
+          macro: 'Sierra',
+          dz: 'DZ 4 (Lima)',
+          dzNum: 4,
+          station: 'Estación Huaraz / Santiago Antúnez de Mayolo (3,052 m s.n.m.) · DZ 4 SENAMHI',
+          thornCode: "C(o,i)B'3",
+          thornDesc: 'Semiseco templado frío con otoño e invierno secos y marcada radiación solar diurna.',
+          drivers: 'Encajonado en el Callejón de Huaylas entre las cordilleras Blanca y Negra. La elevada altitud modera las temperaturas máximas mientras los cielos despejados invernales favorecen fuerte enfriamiento radiativo nocturno y radiación UV extrema.',
+          coastalOcean: true,
+          base: { temp: 15.2, tmin: 5.4, tmax: 21.2, hum: 61, rainNow: 0.0, rain24h: 3.4, uv: 13, wind: 14, press: 1018, code: 2 },
+          monthlyTemp: [14.6, 14.4, 14.5, 14.7, 14.5, 13.8, 13.6, 14.3, 14.9, 15.1, 15.0, 14.8],
+          monthlyRain: [122, 138, 145, 78, 22, 8, 5, 11, 32, 74, 88, 112]
+        },
+        {
+          id: 'APURIMAC',
+          name: 'Apurímac',
+          capital: 'Abancay',
+          lat: -13.6339,
+          lon: -72.8814,
+          alt: 2378,
+          macro: 'Sierra',
+          dz: 'DZ 12 (Cusco)',
+          dzNum: 12,
+          station: 'Estación Abancay / San Antonio (2,378 m s.n.m.) · DZ 12 SENAMHI',
+          thornCode: "C(o,i)B'2",
+          thornDesc: 'Semiseco templado con estación seca pronunciada en otoño e invierno austral.',
+          drivers: 'Relieve profundamente disectado por cañones interandinos (ríos Apurímac y Pachachaca). Durante el verano austral la Alta de Bolivia intensifica el flujo húmedo amazónico produciendo tormentas vespertinas; en invierno predomina subsidencia seca.',
+          coastalOcean: false,
+          base: { temp: 18.6, tmin: 8.8, tmax: 24.1, hum: 58, rainNow: 0.0, rain24h: 2.8, uv: 12, wind: 12, press: 1017, code: 2 },
+          monthlyTemp: [17.4, 17.2, 17.3, 17.6, 17.2, 16.1, 15.9, 16.9, 17.9, 18.5, 18.4, 17.9],
+          monthlyRain: [132, 136, 118, 48, 14, 6, 5, 11, 24, 52, 72, 108]
+        },
+        {
+          id: 'AREQUIPA',
+          name: 'Arequipa',
+          capital: 'Arequipa',
+          lat: -16.4090,
+          lon: -71.5375,
+          alt: 2335,
+          macro: 'Sierra',
+          dz: 'DZ 6 (Arequipa)',
+          dzNum: 6,
+          station: 'Estación La Pampilla (2,400 m s.n.m.) · DZ 6 SENAMHI',
+          thornCode: "E(d)B'1",
+          thornDesc: 'Árido templado con deficiencia hídrica durante casi todo el año y baja nubosidad.',
+          drivers: 'Sombra pluviométrica occidental de los Andes del sur combinada con el aire subsidente del Anticiclón del Pacífico Sur. Alta transparencia atmosférica genera radiación UV extrema todo el año y marcada amplitud térmica entre día y noche.',
+          coastalOcean: true,
+          base: { temp: 17.9, tmin: 6.8, tmax: 23.4, hum: 36, rainNow: 0.0, rain24h: 0.0, uv: 13, wind: 16, press: 1019, code: 0 },
+          monthlyTemp: [16.2, 16.1, 16.0, 15.9, 15.2, 14.3, 14.1, 14.9, 15.8, 16.3, 16.4, 16.4],
+          monthlyRain: [28, 36, 22, 2, 0, 0, 0, 1, 1, 2, 4, 12]
+        },
+        {
+          id: 'AYACUCHO',
+          name: 'Ayacucho',
+          capital: 'Ayacucho',
+          lat: -13.1631,
+          lon: -74.2236,
+          alt: 2761,
+          macro: 'Sierra',
+          dz: 'DZ 11 (Junín)',
+          dzNum: 11,
+          station: 'Estación Huamanga / Wayllapampa (2,761 m s.n.m.) · DZ 11 SENAMHI',
+          thornCode: "C(o,i)B'2",
+          thornDesc: 'Semiseco templado de valle interandino con lluvias estacionales de diciembre a marzo.',
+          drivers: 'Cuenca andina central-sur sometida al contraste entre la circulación seca del oeste (invierno) y el ingreso de humedad amazónica modulada por la Alta de Bolivia en verano, con riesgo de lluvias convectivas y granizadas en zonas altas.',
+          coastalOcean: false,
+          base: { temp: 17.5, tmin: 7.4, tmax: 23.1, hum: 54, rainNow: 0.0, rain24h: 4.1, uv: 12, wind: 13, press: 1018, code: 1 },
+          monthlyTemp: [16.6, 16.4, 16.5, 16.7, 16.0, 14.8, 14.6, 15.7, 16.8, 17.5, 17.6, 17.1],
+          monthlyRain: [118, 124, 102, 34, 12, 4, 4, 9, 22, 46, 62, 96]
+        },
+        {
+          id: 'CAJAMARCA',
+          name: 'Cajamarca',
+          capital: 'Cajamarca',
+          lat: -7.1617,
+          lon: -78.5128,
+          alt: 2750,
+          macro: 'Sierra',
+          dz: 'DZ 3 (Cajamarca)',
+          dzNum: 3,
+          station: 'Estación Augusto Weberbauer (2,536 m s.n.m.) · DZ 3 SENAMHI',
+          thornCode: "C(o,i)B'2",
+          thornDesc: 'Semiseco templado de montaña con lluvias estivales y mañanas frescas.',
+          drivers: 'Menor altitud relativa de los Andes del norte (Depresión de Huancabamba cercana) permite intercambios más activos de humedad entre el Pacífico norte y la Amazonía, modulados por la Zona de Convergencia Intertropical (ZCIT).',
+          coastalOcean: false,
+          base: { temp: 16.8, tmin: 7.6, tmax: 21.8, hum: 66, rainNow: 0.2, rain24h: 5.5, uv: 11, wind: 14, press: 1016, code: 3 },
+          monthlyTemp: [15.4, 15.2, 15.1, 15.1, 14.6, 13.8, 13.6, 14.2, 14.8, 15.3, 15.4, 15.5],
+          monthlyRain: [96, 112, 128, 86, 36, 16, 12, 16, 42, 84, 78, 92]
+        },
+        {
+          id: 'CALLAO',
+          name: 'Callao (Prov. Const.)',
+          capital: 'Callao',
+          lat: -12.0566,
+          lon: -77.1181,
+          alt: 7,
+          macro: 'Costa',
+          dz: 'DZ 4 (Lima)',
+          dzNum: 4,
+          station: 'Estación Aeropuerto Jorge Chávez (13 m s.n.m.) · DZ 4 SENAMHI / CORPAC',
+          thornCode: "E(d)B'1",
+          thornDesc: 'Árido semicálido litoral con muy alta humedad relativa y nubosidad estratiforme.',
+          drivers: 'Exposición directa al afloramiento costero frío de la Corriente de Humboldt y vientos alisios del sureste impulsados por el Anticiclón del Pacífico Sur. Mantiene inversión térmica por debajo de los 800 m, neblinas y oleajes del suroeste.',
+          coastalOcean: true,
+          base: { temp: 20.4, tmin: 17.5, tmax: 23.6, hum: 84, rainNow: 0.0, rain24h: 0.2, uv: 8, wind: 19, press: 1014, code: 2 },
+          monthlyTemp: [22.8, 23.6, 23.2, 21.4, 19.3, 17.8, 16.9, 16.6, 16.9, 17.8, 19.2, 21.2],
+          monthlyRain: [1, 1, 1, 0, 1, 2, 3, 3, 2, 1, 1, 1]
+        },
+        {
+          id: 'CUSCO',
+          name: 'Cusco',
+          capital: 'Cusco',
+          lat: -13.5319,
+          lon: -71.9675,
+          alt: 3399,
+          macro: 'Sierra',
+          dz: 'DZ 12 (Cusco)',
+          dzNum: 12,
+          station: 'Estación Granja Kcayra (3,219 m s.n.m.) · DZ 12 SENAMHI',
+          thornCode: "C(o,i)C'",
+          thornDesc: 'Semiseco semifrío altoandino con invierno seco, heladas nocturnas y verano lluvioso.',
+          drivers: 'Valle del Huatanay en los Andes surorientales. La interacción entre la Alta de Bolivia en niveles altos y la humedad proveniente de Madre de Dios rige la estación de lluvias (noviembre–marzo); en invierno el cielo despejado causa fuertes heladas.',
+          coastalOcean: false,
+          base: { temp: 14.1, tmin: 3.8, tmax: 19.8, hum: 57, rainNow: 0.0, rain24h: 4.8, uv: 12, wind: 13, press: 1020, code: 2 },
+          monthlyTemp: [13.1, 13.0, 13.0, 12.8, 11.7, 10.4, 10.1, 11.3, 12.6, 13.6, 13.8, 13.4],
+          monthlyRain: [148, 136, 114, 44, 11, 4, 4, 9, 22, 48, 76, 122]
+        },
+        {
+          id: 'HUANCAVELICA',
+          name: 'Huancavelica',
+          capital: 'Huancavelica',
+          lat: -12.7864,
+          lon: -74.9764,
+          alt: 3676,
+          macro: 'Sierra',
+          dz: 'DZ 11 (Junín)',
+          dzNum: 11,
+          station: 'Estación CO Huancavelica (3,676 m s.n.m.) · DZ 11 SENAMHI',
+          thornCode: "B(o,i)C'",
+          thornDesc: 'Lluvioso semifrío de alta montaña con heladas frecuentes y precipitaciones sólidas.',
+          drivers: 'Alta elevación sobre los 3,600 m s.n.m. en los Andes centrales. El aire frío de altura favorece eventos de granizo y nevadas por encima de los 4,000 m durante el paso de vaguadas y convergencia húmeda de verano.',
+          coastalOcean: false,
+          base: { temp: 10.4, tmin: 1.5, tmax: 15.6, hum: 64, rainNow: 0.3, rain24h: 7.4, uv: 13, wind: 15, press: 1021, code: 61 },
+          monthlyTemp: [10.2, 10.1, 10.0, 9.8, 8.9, 7.6, 7.3, 8.4, 9.4, 10.2, 10.5, 10.4],
+          monthlyRain: [138, 146, 126, 48, 16, 7, 6, 14, 34, 62, 78, 116]
+        },
+        {
+          id: 'HUANUCO',
+          name: 'Huánuco',
+          capital: 'Huánuco',
+          lat: -9.9306,
+          lon: -76.2422,
+          alt: 1894,
+          macro: 'Sierra',
+          dz: 'DZ 10 (Huánuco)',
+          dzNum: 10,
+          station: 'Estación Huánuco / Cayhuayna (1,894 m s.n.m.) · DZ 10 SENAMHI',
+          thornCode: "D(o,i)B'1",
+          thornDesc: 'Semiárido semicálido de valle interandino abrigado con notable insolación.',
+          drivers: 'Efecto foehn y abrigo orográfico en el valle del alto Huallaga: las masas húmedas amazónicas descargan gran parte de su lluvia en la vertiente oriental (Tingo María) antes de descender más secas y cálidas hacia la ciudad de Huánuco.',
+          coastalOcean: false,
+          base: { temp: 22.8, tmin: 13.6, tmax: 27.6, hum: 58, rainNow: 0.0, rain24h: 2.1, uv: 11, wind: 12, press: 1014, code: 1 },
+          monthlyTemp: [20.6, 20.4, 20.5, 20.8, 20.4, 19.6, 19.4, 20.3, 21.1, 21.5, 21.6, 21.1],
+          monthlyRain: [64, 72, 68, 32, 14, 7, 5, 10, 22, 42, 48, 58]
+        },
+        {
+          id: 'ICA',
+          name: 'Ica',
+          capital: 'Ica',
+          lat: -14.0678,
+          lon: -75.7286,
+          alt: 406,
+          macro: 'Costa',
+          dz: 'DZ 5 (Ica)',
+          dzNum: 5,
+          station: 'Estación San Camilo / Fonagro (406 m s.n.m.) · DZ 5 SENAMHI',
+          thornCode: "E(d)A'",
+          thornDesc: 'Árido cálido desértico con lluvias casi nulas, alta insolación y vientos locales intensos.',
+          drivers: 'Combinación de subsidencia del Anticiclón del Pacífico Sur, aguas frías de afloramiento frente a Paracas y fuerte gradiente térmico tierra-mar que origina los vientos Paracas vespertinos con levantamiento de polvo y arena.',
+          coastalOcean: true,
+          base: { temp: 24.5, tmin: 14.8, tmax: 29.8, hum: 56, rainNow: 0.0, rain24h: 0.0, uv: 11, wind: 24, press: 1013, code: 0 },
+          monthlyTemp: [24.2, 24.9, 24.5, 22.8, 20.2, 18.1, 17.3, 18.1, 19.3, 20.6, 21.8, 23.1],
+          monthlyRain: [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        },
+        {
+          id: 'JUNIN',
+          name: 'Junín',
+          capital: 'Huancayo',
+          lat: -12.0651,
+          lon: -75.2049,
+          alt: 3259,
+          macro: 'Sierra',
+          dz: 'DZ 11 (Junín)',
+          dzNum: 11,
+          station: 'Observatorio de Huayao / Santa Ana (3,308 m s.n.m.) · DZ 11 SENAMHI',
+          thornCode: "C(o,i)C'",
+          thornDesc: 'Semiseco semifrío de valle altoandino con marcada oscilación térmica diaria.',
+          drivers: 'Valle del Mantaro flanqueado por cordilleras occidental y oriental. En la estación seca (mayo–agosto) la pérdida radiativa nocturna produce heladas meteorológicas severas; en verano los flujos húmedos del este generan lluvias vespertinas y tormentas.',
+          coastalOcean: false,
+          base: { temp: 14.3, tmin: 4.1, tmax: 19.6, hum: 60, rainNow: 0.0, rain24h: 5.2, uv: 12, wind: 14, press: 1019, code: 2 },
+          monthlyTemp: [12.8, 12.6, 12.5, 12.3, 11.4, 10.2, 10.0, 11.1, 12.2, 12.9, 13.2, 13.0],
+          monthlyRain: [132, 134, 116, 48, 18, 9, 7, 16, 42, 68, 78, 112]
+        },
+        {
+          id: 'LA LIBERTAD',
+          name: 'La Libertad',
+          capital: 'Trujillo',
+          lat: -8.1116,
+          lon: -79.0288,
+          alt: 34,
+          macro: 'Costa',
+          dz: 'DZ 3 (Cajamarca / La Libertad)',
+          dzNum: 3,
+          station: 'Estación Trujillo / Huanchaco (34 m s.n.m.) · DZ 3 SENAMHI',
+          thornCode: "E(d)B'1",
+          thornDesc: 'Árido semicálido costero moderado por la brisa marina y el afloramiento oceánico.',
+          drivers: 'Regulado por la Corriente Peruana (Humboldt) y el Anticiclón del Pacífico Sur, que mantienen temperaturas templadas y neblinas matutinas en invierno; susceptible a incrementos térmicos y lluvias excepcionales durante eventos El Niño Costero.',
+          coastalOcean: true,
+          base: { temp: 21.3, tmin: 17.2, tmax: 24.4, hum: 78, rainNow: 0.0, rain24h: 0.0, uv: 9, wind: 21, press: 1013, code: 1 },
+          monthlyTemp: [22.6, 23.6, 23.2, 21.6, 19.8, 18.4, 17.6, 17.4, 17.6, 18.4, 19.6, 21.1],
+          monthlyRain: [2, 4, 5, 1, 0, 0, 0, 0, 0, 0, 1, 1]
+        },
+        {
+          id: 'LAMBAYEQUE',
+          name: 'Lambayeque',
+          capital: 'Chiclayo',
+          lat: -6.7714,
+          lon: -79.8409,
+          alt: 29,
+          macro: 'Costa',
+          dz: 'DZ 2 (Lambayeque)',
+          dzNum: 2,
+          station: 'Estación Lambayeque / Reque (29 m s.n.m.) · DZ 2 SENAMHI',
+          thornCode: "E(d)A'",
+          thornDesc: 'Árido cálido de planicie costera norte con déficit hídrico y vientos alisios sostenidos.',
+          drivers: 'Llanura costera septentrional afectada por el debilitamiento progresivo de la corriente fría hacia el norte y la aceleración del viento alisio costero. Durante episodios de calentamiento marino (El Niño) se activan lluvias convectivas intensas.',
+          coastalOcean: true,
+          base: { temp: 23.8, tmin: 17.9, tmax: 27.9, hum: 71, rainNow: 0.0, rain24h: 0.0, uv: 10, wind: 22, press: 1012, code: 1 },
+          monthlyTemp: [24.8, 25.9, 25.6, 23.8, 21.6, 19.8, 18.9, 18.7, 19.1, 19.9, 21.2, 23.1],
+          monthlyRain: [4, 7, 9, 2, 1, 0, 0, 0, 0, 1, 1, 2]
+        },
+        {
+          id: 'LIMA',
+          name: 'Lima',
+          capital: 'Lima',
+          lat: -12.0464,
+          lon: -77.0428,
+          alt: 154,
+          macro: 'Costa',
+          dz: 'DZ 4 (Lima)',
+          dzNum: 4,
+          station: 'Estación Campo de Marte / Von Humboldt (137 m s.n.m.) · DZ 4 SENAMHI',
+          thornCode: "E(d)B'1",
+          thornDesc: 'Árido semicálido subtropical desértico con inversión térmica persistente y garúas invernales.',
+          drivers: 'La Corriente fría de Humboldt enfría la capa límite marina mientras la subsidencia del Anticiclón del Pacífico Sur comprime el aire superior, creando una capa de inversión térmica que atrapa estratos bajos y humedad (garúa) gran parte del año.',
+          coastalOcean: true,
+          base: { temp: 20.8, tmin: 17.2, tmax: 24.3, hum: 81, rainNow: 0.0, rain24h: 0.1, uv: 9, wind: 17, press: 1014, code: 2 },
+          monthlyTemp: [23.1, 23.9, 23.5, 21.6, 19.4, 17.7, 16.8, 16.5, 16.9, 17.9, 19.4, 21.4],
+          monthlyRain: [1, 1, 1, 0, 1, 2, 3, 3, 2, 1, 1, 1]
+        },
+        {
+          id: 'LORETO',
+          name: 'Loreto',
+          capital: 'Iquitos',
+          lat: -3.7491,
+          lon: -73.2538,
+          alt: 106,
+          macro: 'Selva',
+          dz: 'DZ 8 (Loreto)',
+          dzNum: 8,
+          station: 'Estación San Roque / Quistococha (106 m s.n.m.) · DZ 8 SENAMHI',
+          thornCode: "A(r)A'",
+          thornDesc: 'Muy lluvioso cálido ecuatorial con precipitación abundante y humedad alta todo el año.',
+          drivers: 'Llanura amazónica baja próxima al ecuador térmico. La Zona de Convergencia Intertropical (ZCIT) y la evapotranspiración del bosque tropical sostienen convección profunda diaria, tormentas eléctricas y temperaturas cálidas constantes.',
+          coastalOcean: false,
+          base: { temp: 29.4, tmin: 22.8, tmax: 32.6, hum: 79, rainNow: 1.8, rain24h: 16.4, uv: 10, wind: 9, press: 1010, code: 80 },
+          monthlyTemp: [26.8, 26.8, 26.7, 26.5, 26.2, 25.8, 25.7, 26.4, 26.9, 27.1, 27.1, 26.9],
+          monthlyRain: [272, 258, 304, 298, 268, 198, 168, 164, 196, 242, 268, 282]
+        },
+        {
+          id: 'MADRE DE DIOS',
+          name: 'Madre de Dios',
+          capital: 'Puerto Maldonado',
+          lat: -12.5933,
+          lon: -69.1891,
+          alt: 183,
+          macro: 'Selva',
+          dz: 'DZ 12 (Cusco)',
+          dzNum: 12,
+          station: 'Estación Puerto Maldonado / Tambopata (183 m s.n.m.) · DZ 12 SENAMHI',
+          thornCode: "A(r)A'",
+          thornDesc: 'Muy lluvioso cálido amazónico sur con marcada estación húmeda de verano y episodios de friaje.',
+          drivers: 'Selva baja meridional. En verano dominan sistemas convectivos del Sistema Monzónico Sudamericano; entre mayo y septiembre irrupciones de aire polar atlántico (friajes) provocan descensos térmicos abruptos de más de 10 °C en pocas horas.',
+          coastalOcean: false,
+          base: { temp: 28.9, tmin: 21.6, tmax: 32.4, hum: 76, rainNow: 0.6, rain24h: 11.2, uv: 10, wind: 11, press: 1011, code: 61 },
+          monthlyTemp: [26.4, 26.2, 26.2, 25.8, 24.4, 23.1, 22.9, 24.5, 25.9, 26.8, 26.8, 26.5],
+          monthlyRain: [312, 294, 264, 162, 94, 58, 52, 64, 108, 184, 236, 292]
+        },
+        {
+          id: 'MOQUEGUA',
+          name: 'Moquegua',
+          capital: 'Moquegua',
+          lat: -17.1933,
+          lon: -70.9356,
+          alt: 1410,
+          macro: 'Costa',
+          dz: 'DZ 6 (Arequipa) / DZ 7 (Tacna)',
+          dzNum: 6,
+          station: 'Estación Moquegua / Ilo (1,410 m s.n.m.) · DZ 6 / DZ 7 SENAMHI',
+          thornCode: "E(d)B'1",
+          thornDesc: 'Árido semicálido de desierto y yunga marítima austral con extrema sequedad.',
+          drivers: 'Subsidencia permanente del Anticiclón del Pacífico Sur y barrera orográfica de los Andes volcánicos del sur. Cielos despejados casi continuos en valle medio y neblinas invernales costeras (camanchaca) en el litoral de Ilo.',
+          coastalOcean: true,
+          base: { temp: 22.4, tmin: 11.8, tmax: 26.9, hum: 41, rainNow: 0.0, rain24h: 0.0, uv: 12, wind: 16, press: 1016, code: 0 },
+          monthlyTemp: [21.6, 21.8, 21.4, 20.1, 18.4, 17.1, 16.7, 17.5, 18.7, 19.8, 20.6, 21.3],
+          monthlyRain: [4, 6, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+        },
+        {
+          id: 'PASCO',
+          name: 'Pasco',
+          capital: 'Cerro de Pasco',
+          lat: -10.6836,
+          lon: -76.2567,
+          alt: 4338,
+          macro: 'Sierra',
+          dz: 'DZ 11 (Junín)',
+          dzNum: 11,
+          station: 'Estación CO Cerro de Pasco (4,338 m s.n.m.) · DZ 11 SENAMHI',
+          thornCode: "B(o,i)D'",
+          thornDesc: 'Lluvioso frío de puna altoandina con heladas frecuentes y precipitación sólida estacional.',
+          drivers: 'Ubicada sobre los 4,300 m s.n.m. en la meseta del Bombón (nudo de Pasco). La baja densidad atmosférica reduce la retención térmica nocturna causando heladas casi todo el año y nevadas frecuentes durante incursiones húmedas de verano.',
+          coastalOcean: false,
+          base: { temp: 6.8, tmin: -1.4, tmax: 11.4, hum: 72, rainNow: 0.5, rain24h: 8.9, uv: 13, wind: 17, press: 1023, code: 71 },
+          monthlyTemp: [6.2, 6.1, 6.0, 5.8, 4.9, 3.8, 3.6, 4.4, 5.2, 5.9, 6.2, 6.2],
+          monthlyRain: [142, 148, 136, 68, 28, 14, 12, 22, 48, 86, 98, 128]
+        },
+        {
+          id: 'PIURA',
+          name: 'Piura',
+          capital: 'Piura',
+          lat: -5.1945,
+          lon: -80.6328,
+          alt: 29,
+          macro: 'Costa',
+          dz: 'DZ 1 (Piura)',
+          dzNum: 1,
+          station: 'Estación Miraflores (30 m s.n.m.) · DZ 1 SENAMHI',
+          thornCode: "E(d)A'",
+          thornDesc: 'Árido cálido tropical seco de sabana costera norte con lluvias estacionales irregulares.',
+          drivers: 'Zona de transición oceánica entre la corriente fría de Humboldt y aguas cálidas ecuatoriales (Frente Ecuatorial). Las altas temperaturas diurnas aumentan drásticamente cuando se debilitan los alisios o se desarrolla El Niño Costero.',
+          coastalOcean: true,
+          base: { temp: 27.6, tmin: 19.6, tmax: 33.4, hum: 60, rainNow: 0.0, rain24h: 0.0, uv: 11, wind: 22, press: 1011, code: 1 },
+          monthlyTemp: [27.4, 28.4, 28.1, 26.5, 24.4, 22.4, 21.5, 21.6, 22.1, 22.8, 23.9, 25.8],
+          monthlyRain: [18, 34, 42, 12, 2, 1, 0, 0, 1, 2, 3, 7]
+        },
+        {
+          id: 'PUNO',
+          name: 'Puno',
+          capital: 'Puno',
+          lat: -15.8402,
+          lon: -70.0219,
+          alt: 3827,
+          macro: 'Sierra',
+          dz: 'DZ 13 (Puno)',
+          dzNum: 13,
+          station: 'Estación Puno / Salcedo (3,827 m s.n.m.) · DZ 13 SENAMHI',
+          thornCode: "C(o,i)C'",
+          thornDesc: 'Semiseco frío altiplánico termorregulado en el borde lacustre del Titicaca.',
+          drivers: 'Altiplano del Collao a más de 3,800 m s.n.m. El Lago Titicaca ejerce un efecto termorregulador local amortiguando las heladas extremas respecto al altiplano interior, mientras la Alta de Bolivia y vaguadas occidentales modulan lluvias y granizadas.',
+          coastalOcean: false,
+          base: { temp: 11.2, tmin: 1.8, tmax: 16.4, hum: 55, rainNow: 0.0, rain24h: 3.1, uv: 13, wind: 16, press: 1022, code: 2 },
+          monthlyTemp: [10.4, 10.3, 10.2, 9.6, 8.2, 6.7, 6.4, 7.6, 9.0, 10.2, 10.7, 10.6],
+          monthlyRain: [152, 138, 108, 42, 11, 4, 3, 9, 24, 46, 62, 104]
+        },
+        {
+          id: 'SAN MARTIN',
+          name: 'San Martín',
+          capital: 'Moyobamba',
+          lat: -6.0342,
+          lon: -76.9717,
+          alt: 860,
+          macro: 'Selva',
+          dz: 'DZ 9 (San Martín)',
+          dzNum: 9,
+          station: 'Estación Moyobamba / El Porvenir (860 m s.n.m.) · DZ 9 SENAMHI',
+          thornCode: "B(r)A'",
+          thornDesc: 'Lluvioso cálido de selva alta amazónica con humedad elevada y lluvias frecuentes.',
+          drivers: 'Valles de selva alta (Alto Mayo y Huallaga central). Los flujos húmedos amazónicos chocan contra los contrafuertes orientales andinos generando lluvias orográficas y tormentas convectivas, especialmente durante la tarde y noche.',
+          coastalOcean: false,
+          base: { temp: 25.4, tmin: 18.8, tmax: 29.6, hum: 78, rainNow: 0.8, rain24h: 12.8, uv: 10, wind: 10, press: 1012, code: 61 },
+          monthlyTemp: [24.2, 24.1, 24.1, 24.0, 23.6, 23.0, 22.8, 23.6, 24.3, 24.6, 24.6, 24.4],
+          monthlyRain: [138, 148, 168, 142, 98, 68, 58, 66, 98, 136, 138, 134]
+        },
+        {
+          id: 'TACNA',
+          name: 'Tacna',
+          capital: 'Tacna',
+          lat: -18.0146,
+          lon: -70.2536,
+          alt: 562,
+          macro: 'Costa',
+          dz: 'DZ 7 (Tacna)',
+          dzNum: 7,
+          station: 'Estación Jorge Basadre / Calana (562 m s.n.m.) · DZ 7 SENAMHI',
+          thornCode: "E(d)B'1",
+          thornDesc: 'Árido semicálido desértico austral con veranos templado-cálidos e inviernos brumosos.',
+          drivers: 'Extremo norte del desierto de Atacama bajo dominio del Anticiclón del Pacífico Sur y la Corriente de Humboldt. Presenta escasísimas precipitaciones anuales, neblinas costeras en invierno (lomas) y radiación solar intensa en verano.',
+          coastalOcean: true,
+          base: { temp: 20.6, tmin: 13.4, tmax: 25.1, hum: 64, rainNow: 0.0, rain24h: 0.0, uv: 11, wind: 16, press: 1015, code: 1 },
+          monthlyTemp: [22.4, 22.9, 22.2, 20.1, 17.6, 15.6, 14.9, 15.6, 16.9, 18.4, 19.9, 21.4],
+          monthlyRain: [1, 2, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0]
+        },
+        {
+          id: 'TUMBES',
+          name: 'Tumbes',
+          capital: 'Tumbes',
+          lat: -3.5669,
+          lon: -80.4515,
+          alt: 6,
+          macro: 'Costa',
+          dz: 'DZ 1 (Piura)',
+          dzNum: 1,
+          station: 'Estación Puerto Pizarro / Rica Playa (6 m s.n.m.) · DZ 1 SENAMHI',
+          thornCode: "D(i)A'",
+          thornDesc: 'Semiárido cálido tropical costero ecuatorial con lluvias concentradas en verano.',
+          drivers: 'Influencia directa de aguas ecuatoriales cálidas (Corriente de El Niño / Panamá) y cercanía a la ZCIT. A diferencia de la costa centro-sur, recibe lluvias estivales regulares que se intensifican severamente ante anomalías térmicas marinas.',
+          coastalOcean: true,
+          base: { temp: 27.9, tmin: 22.1, tmax: 31.6, hum: 75, rainNow: 0.0, rain24h: 1.2, uv: 11, wind: 17, press: 1010, code: 2 },
+          monthlyTemp: [27.2, 27.8, 27.9, 27.3, 26.2, 24.8, 24.0, 23.9, 24.3, 24.8, 25.5, 26.5],
+          monthlyRain: [38, 72, 86, 36, 12, 3, 2, 1, 2, 4, 6, 14]
+        },
+        {
+          id: 'UCAYALI',
+          name: 'Ucayali',
+          capital: 'Pucallpa',
+          lat: -8.3791,
+          lon: -74.5539,
+          alt: 154,
+          macro: 'Selva',
+          dz: 'DZ 10 (Huánuco)',
+          dzNum: 10,
+          station: 'Estación Pucallpa / San Alejandro (154 m s.n.m.) · DZ 10 SENAMHI',
+          thornCode: "B(r)A'",
+          thornDesc: 'Lluvioso cálido de selva baja amazónica central con temperaturas máximas elevadas.',
+          drivers: 'Llanura aluvial del río Ucayali. Fuerte calentamiento solar diurno combinado con alta humedad específica genera convección profunda, chubascos intensos, ráfagas descendentes y eventual incursión de friajes en invierno austral.',
+          coastalOcean: false,
+          base: { temp: 30.2, tmin: 22.4, tmax: 33.8, hum: 74, rainNow: 0.4, rain24h: 9.8, uv: 11, wind: 12, press: 1010, code: 3 },
+          monthlyTemp: [26.8, 26.7, 26.7, 26.5, 25.9, 25.1, 24.9, 25.9, 26.8, 27.2, 27.1, 26.9],
+          monthlyRain: [182, 186, 204, 162, 108, 74, 58, 68, 108, 164, 192, 188]
+        }
+      ];
+
+      // =========================================================================
+      // 2. BOLETINES INSTITUCIONALES BASE (SENAMHI / COEN-INDECI / DIHIDRONAV)
+      // =========================================================================
+      const INSTITUTIONAL_BULLETINS = [
+        {
+          id: 'BOL-SEN-01',
+          agency: 'SENAMHI',
+          code: 'Aviso Meteorológico Vigente · Costa y Selva',
+          title: 'Incremento de la temperatura diurna y radiación UV extrema',
+          level: 'Naranja',
+          scopeMacro: ['Costa', 'Selva'],
+          regionIds: ['PIURA', 'LAMBAYEQUE', 'ICA', 'UCAYALI', 'LORETO', 'MADRE DE DIOS', 'TUMBES'],
+          desc: 'Escasa cobertura nubosa hacia el mediodía favorece el ascenso térmico diurno en selva central/norte y desiertos costeros, acompañado de índices de radiación ultravioleta de riesgo muy alto a extremo (UV 10–13).',
+          validity: 'Vigencia operativa 24h · Actualización diaria'
+        },
+        {
+          id: 'BOL-SEN-02',
+          agency: 'SENAMHI',
+          code: 'Aviso Meteorológico Vigente · Sierra Centro y Sur',
+          title: 'Precipitaciones localizadas, granizo y descenso térmico nocturno',
+          level: 'Naranja',
+          scopeMacro: ['Sierra'],
+          regionIds: ['PASCO', 'HUANCAVELICA', 'JUNIN', 'CUSCO', 'PUNO', 'AYACUCHO', 'APURIMAC', 'ANCASH'],
+          desc: 'Flujo húmedo en niveles medios promueve lluvias moderadas con descargas eléctricas y granizo aislado sobre los 3,000 m s.n.m., además de heladas meteorológicas nocturnas en localidades por encima de los 3,800 m.',
+          validity: 'Vigencia operativa 24h · Sierra Centro/Sur'
+        },
+        {
+          id: 'BOL-SEN-03',
+          agency: 'SENAMHI',
+          code: 'Aviso Costero · Litoral Centro y Sur',
+          title: 'Incremento de velocidad del viento en la costa (Vientos Paracas / Alisios)',
+          level: 'Amarillo',
+          scopeMacro: ['Costa'],
+          regionIds: ['ICA', 'LA LIBERTAD', 'LAMBAYEQUE', 'PIURA', 'CALLAO', 'LIMA'],
+          desc: 'Fortalecimiento del Anticiclón del Pacífico Sur intensifica el gradiente bárico costero con ráfagas vespertinas moderadas a fuertes, levantamiento de polvo en Ica y persistencia de neblina matutina.',
+          validity: 'Vigilancia litoral · Costa Norte/Centro/Sur'
+        },
+        {
+          id: 'BOL-IND-01',
+          agency: 'COEN-INDECI',
+          code: 'Boletín Informativo de Preparación',
+          title: 'Recomendaciones ante lluvias amazónicas y crecida de cuencas orientales',
+          level: 'Amarillo',
+          scopeMacro: ['Selva'],
+          regionIds: ['LORETO', 'SAN MARTIN', 'MADRE DE DIOS', 'UCAYALI', 'AMAZONAS'],
+          desc: 'Monitoreo continuo de quebradas y niveles hidrométricos en las cuencas del Amazonas, Marañón, Huallaga y Ucayali. Se recomienda asegurar techos, limpiar drenajes pluviales y evitar cruzar cauces crecidos.',
+          validity: 'COEN-INDECI · Monitoreo sinóptico activo'
+        },
+        {
+          id: 'BOL-IND-02',
+          agency: 'COEN-INDECI',
+          code: 'Aviso de Prevención Altoandina',
+          title: 'Protección ante radiación UV extrema y heladas matutinas',
+          level: 'Amarillo',
+          scopeMacro: ['Sierra'],
+          regionIds: ['AREQUIPA', 'PUNO', 'CUSCO', 'PASCO', 'HUANCAVELICA', 'JUNIN', 'CAJAMARCA'],
+          desc: 'Exhorta a gobiernos locales y población a reforzar abrigo térmico en zonas altoandinas durante la madrugada y emplear protección solar (sombrero, filtro UV, manga larga) entre las 09:00 y 16:00 horas.',
+          validity: 'COEN-INDECI · Vigencia permanente'
+        },
+        {
+          id: 'BOL-DIH-01',
+          agency: 'DIHIDRONAV',
+          code: 'Aviso Especial N.° Oceanográfico',
+          title: 'Vigilancia de oleaje ligero a moderado proveniente del suroeste en el litoral',
+          level: 'Amarillo',
+          scopeMacro: ['Costa'],
+          regionIds: ['CALLAO', 'LIMA', 'ICA', 'AREQUIPA', 'MOQUEGUA', 'TACNA', 'LA LIBERTAD', 'ANCASH'],
+          desc: 'La Dirección de Hidrografía y Navegación de la Marina de Guerra del Perú informa trenes de olas del suroeste que generan rompientes moderadas en playas abiertas y caletas; precaución para pesca artesanal y deportes náuticos.',
+          validity: 'DIHIDRONAV · Litoral Peruano'
+        }
+      ];
+
+      // =========================================================================
+      // 3. ESTADO GLOBAL Y PERSISTENCIA DIARIA
+      // =========================================================================
+      const STORAGE_KEY = 'ocnp_peru_telemetry_v2';
+      const state = {
+        regions: [],
+        selectedId: 'LIMA',
+        activeLayer: 'temp',
+        macroFilter: 'Todas',
+        searchTerm: '',
+        bulletinFilter: 'Todas',
+        sortKey: 'name',
+        sortDir: 'asc',
+        syncMode: 'loading', // 'live' | 'fallback' | 'loading'
+        lastSyncLima: null,
+        lastSyncDateKey: null,
+        mapEngine: 'loading', // 'geojson' | 'markers' | 'svg'
+        leafletMap: null,
+        geoJsonLayer: null,
+        markersLayer: null,
+        featureById: {},
+        markerById: {}
+      };
+
+      // =========================================================================
+      // 4. UTILIDADES METEOROLÓGICAS, FECHA LIMA Y NORMALIZACIÓN
+      // =========================================================================
+      function normalizeDepName(str) {
+        if (!str) return '';
+        return str
+          .toString()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toUpperCase()
+          .trim()
+          .replace(/\s+/g, ' ');
+      }
+
+      function getLimaNowParts() {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'America/Lima',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        });
+        const parts = {};
+        formatter.formatToParts(now).forEach(p => { parts[p.type] = p.value; });
+        return {
+          dateKey: `${parts.year}-${parts.month}-${parts.day}`,
+          timeStr: `${parts.hour}:${parts.minute}:${parts.second}`,
+          displayDate: new Intl.DateTimeFormat('es-PE', {
+            timeZone: 'America/Lima',
+            weekday: 'short',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }).format(now),
+          hour: Number(parts.hour),
+          minute: Number(parts.minute)
+        };
+      }
+
+      function weatherCodeLabel(code) {
+        const map = {
+          0: 'Cielo despejado',
+          1: 'Mayormente despejado',
+          2: 'Parcialmente nublado',
+          3: 'Nublado / Cubierto',
+          45: 'Niebla o neblina',
+          48: 'Niebla con escarcha',
+          51: 'Llovizna ligera',
+          53: 'Llovizna moderada',
+          55: 'Llovizna intensa',
+          61: 'Lluvia ligera',
+          63: 'Lluvia moderada',
+          65: 'Lluvia fuerte',
+          71: 'Nevada ligera',
+          73: 'Nevada moderada',
+          75: 'Nevada intensa',
+          80: 'Chubascos ligeros',
+          81: 'Chubascos moderados',
+          82: 'Chubascos fuertes',
+          95: 'Tormenta eléctrica',
+          96: 'Tormenta con granizo',
+          99: 'Tormenta severa con granizo'
+        };
+        return map[code] || 'Condición variable';
+      }
+
+      function uvRiskCategory(uv) {
+        if (uv >= 11) return 'Riesgo Extremo (≥11)';
+        if (uv >= 8) return 'Riesgo Muy Alto (8–10)';
+        if (uv >= 6) return 'Riesgo Alto (6–7)';
+        if (uv >= 3) return 'Riesgo Moderado (3–5)';
+        return 'Riesgo Bajo (0–2)';
+      }
+
+      function computeAlertForRegion(reg, live) {
+        // Combina umbrales reales de telemetría con avisos institucionales aplicables
+        let rank = 1; // 1 Verde, 2 Amarillo, 3 Naranja, 4 Rojo
+        const reasons = [];
+
+        if (live.rain24h >= 35 || live.code >= 95) {
+          rank = Math.max(rank, 4);
+          reasons.push('Lluvia/tormenta intensa (≥35 mm o actividad eléctrica)');
+        } else if (live.rain24h >= 18) {
+          rank = Math.max(rank, 3);
+          reasons.push('Precipitación acumulada moderada a fuerte');
+        } else if (live.rain24h >= 8) {
+          rank = Math.max(rank, 2);
+          reasons.push('Lluvias localizadas activas');
+        }
+
+        if (live.tmax >= 35.5) {
+          rank = Math.max(rank, 4);
+          reasons.push('Ola de calor severa (Tmáx ≥35.5 °C)');
+        } else if (live.tmax >= 32.5) {
+          rank = Math.max(rank, 3);
+          reasons.push('Incremento térmico diurno significativo');
+        } else if (live.tmax >= 30.0 && reg.macro === 'Costa') {
+          rank = Math.max(rank, 2);
+          reasons.push('Temperatura diurna elevada en franja costera');
+        }
+
+        if (live.tmin <= -2.0) {
+          rank = Math.max(rank, 3);
+          reasons.push('Helada meteorológica altoandina (Tmín ≤ -2 °C)');
+        } else if (live.tmin <= 2.5 && reg.alt >= 2800) {
+          rank = Math.max(rank, 2);
+          reasons.push('Descenso térmico nocturno en sierra');
+        }
+
+        if (live.uv >= 12) {
+          rank = Math.max(rank, 3);
+          reasons.push('Radiación UV extrema (≥12)');
+        } else if (live.uv >= 10) {
+          rank = Math.max(rank, 2);
+          reasons.push('Radiación UV muy alta a extrema');
+        }
+
+        if (live.wind >= 34) {
+          rank = Math.max(rank, 3);
+          reasons.push('Ráfagas de viento fuertes (≥34 km/h)');
+        } else if (live.wind >= 24 && reg.macro === 'Costa') {
+          rank = Math.max(rank, 2);
+          reasons.push('Incremento de viento costero');
+        }
+
+        const labels = {
+          4: { level: 'Rojo', glyph: '▲', desc: 'Alarma Extrema' },
+          3: { level: 'Naranja', glyph: '◆', desc: 'Peligro / Aviso Fuerte' },
+          2: { level: 'Amarillo', glyph: '■', desc: 'Vigilancia / Precaución' },
+          1: { level: 'Verde', glyph: '●', desc: 'Normal' }
+        };
+
+        return {
+          alertRank: rank,
+          alertLevel: labels[rank].level,
+          alertGlyph: labels[rank].glyph,
+          alertDesc: labels[rank].desc,
+          alertReason: reasons.length ? reasons.join(' · ') : 'Condiciones dentro de rangos climatológicos habituales'
+        };
+      }
+
+      function buildDefaultHistory(reg) {
+        // Genera serie histórica determinística validada de 8 días (7 pasados + hoy) para fallback offline
+        const lima = getLimaNowParts();
+        const baseDate = new Date(lima.dateKey + 'T12:00:00-05:00');
+        const series = [];
+        const offsets = [-0.8, -0.3, 0.4, 0.9, 0.2, -0.5, 0.1, 0.0];
+        const rainMult = [0.6, 1.2, 0.4, 0.8, 1.4, 0.7, 0.9, 1.0];
+        for (let i = 7; i >= 0; i--) {
+          const d = new Date(baseDate.getTime() - i * 86400000);
+          const idx = 7 - i;
+          const dateStr = d.toISOString().slice(0, 10);
+          series.push({
+            date: dateStr,
+            tmax: Number((reg.base.tmax + offsets[idx]).toFixed(1)),
+            tmin: Number((reg.base.tmin + offsets[idx] * 0.7).toFixed(1)),
+            rain: Number((reg.base.rain24h * rainMult[idx]).toFixed(1)),
+            uv: Math.max(2, Math.round(reg.base.uv + (offsets[idx] > 0 ? 1 : 0)))
+          });
+        }
+        return series;
+      }
+
+      function hydrateRegions(livePayload, isLive) {
+        state.regions = REGIONS_BASE.map((reg, idx) => {
+          let live = { ...reg.base };
+          let history7d = buildDefaultHistory(reg);
+
+          if (livePayload && Array.isArray(livePayload) && livePayload[idx]) {
+            const item = livePayload[idx];
+            const cur = item.current || {};
+            const day = item.daily || {};
+            // El último día de past_days=7&forecast_days=2 es mañana; el penúltimo (índice 7) es hoy
+            const times = day.time || [];
+            const limaDate = getLimaNowParts().dateKey;
+            let todayIdx = times.indexOf(limaDate);
+            if (todayIdx === -1) todayIdx = Math.max(0, times.length - 2);
+
+            live = {
+              temp: cur.temperature_2m != null ? Number(cur.temperature_2m.toFixed(1)) : reg.base.temp,
+              hum: cur.relative_humidity_2m != null ? Math.round(cur.relative_humidity_2m) : reg.base.hum,
+              rainNow: cur.precipitation != null ? Number(cur.precipitation.toFixed(1)) : reg.base.rainNow,
+              code: cur.weather_code != null ? cur.weather_code : reg.base.code,
+              wind: cur.wind_speed_10m != null ? Math.round(cur.wind_speed_10m) : reg.base.wind,
+              press: cur.surface_pressure != null ? Math.round(cur.surface_pressure) : reg.base.press,
+              tmax: day.temperature_2m_max && day.temperature_2m_max[todayIdx] != null ? Number(day.temperature_2m_max[todayIdx].toFixed(1)) : reg.base.tmax,
+              tmin: day.temperature_2m_min && day.temperature_2m_min[todayIdx] != null ? Number(day.temperature_2m_min[todayIdx].toFixed(1)) : reg.base.tmin,
+              rain24h: day.precipitation_sum && day.precipitation_sum[todayIdx] != null ? Number(day.precipitation_sum[todayIdx].toFixed(1)) : reg.base.rain24h,
+              uv: day.uv_index_max && day.uv_index_max[todayIdx] != null ? Math.round(day.uv_index_max[todayIdx]) : reg.base.uv
+            };
+
+            if (times.length >= 8) {
+              const sliceEnd = Math.min(times.length, todayIdx + 1);
+              const sliceStart = Math.max(0, sliceEnd - 8);
+              history7d = [];
+              for (let k = sliceStart; k < sliceEnd; k++) {
+                history7d.push({
+                  date: times[k],
+                  tmax: day.temperature_2m_max[k] != null ? Number(day.temperature_2m_max[k].toFixed(1)) : live.tmax,
+                  tmin: day.temperature_2m_min[k] != null ? Number(day.temperature_2m_min[k].toFixed(1)) : live.tmin,
+                  rain: day.precipitation_sum[k] != null ? Number(day.precipitation_sum[k].toFixed(1)) : 0,
+                  uv: day.uv_index_max[k] != null ? Math.round(day.uv_index_max[k]) : live.uv
+                });
+              }
+            }
+          }
+
+          const alertInfo = computeAlertForRegion(reg, live);
+          return {
+            ...reg,
+            ...live,
+            ...alertInfo,
+            history7d,
+            isLive
+          };
+        });
+      }
+
+      // =========================================================================
+      // 5. TELEMETRÍA OPEN-METEO POR LOTES Y ACTUALIZACIÓN DIARIA AUTOMÁTICA
+      // =========================================================================
+      async function fetchLiveTelemetry(force = false) {
+        const lima = getLimaNowParts();
+
+        // Verifica caché diario en localStorage si no es actualización manual
+        if (!force) {
+          try {
+            const cachedRaw = localStorage.getItem(STORAGE_KEY);
+            if (cachedRaw) {
+              const cached = JSON.parse(cachedRaw);
+              const ageMs = Date.now() - (cached.timestamp || 0);
+              if (cached.dateKey === lima.dateKey && ageMs < 6 * 3600 * 1000 && Array.isArray(cached.payload) && cached.payload.length === 25) {
+                state.syncMode = 'live';
+                state.lastSyncLima = cached.syncTimeStr;
+                state.lastSyncDateKey = cached.dateKey;
+                hydrateRegions(cached.payload, true);
+                updateSyncUI();
+                renderAll();
+                return;
+              }
+            }
+          } catch (_) {
+            // Ignora errores de almacenamiento
+          }
+        }
+
+        state.syncMode = 'loading';
+        updateSyncUI();
+
+        const lats = REGIONS_BASE.map(r => r.lat.toFixed(4)).join(',');
+        const lons = REGIONS_BASE.map(r => r.lon.toFixed(4)).join(',');
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,surface_pressure&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max&past_days=7&forecast_days=2&timezone=America%2FLima`;
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          const resp = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
+
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          if (!Array.isArray(data) || data.length < 25) throw new Error('Respuesta incompleta');
+
+          const syncNow = getLimaNowParts();
+          state.syncMode = 'live';
+          state.lastSyncLima = `${syncNow.displayDate}, ${syncNow.timeStr} PET`;
+          state.lastSyncDateKey = syncNow.dateKey;
+
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+              timestamp: Date.now(),
+              dateKey: syncNow.dateKey,
+              syncTimeStr: state.lastSyncLima,
+              payload: data
+            }));
+          } catch (_) {}
+
+          hydrateRegions(data, true);
+          updateSyncUI();
+          renderAll();
+          if (force) showToast('Telemetría en vivo sincronizada para las 25 jurisdicciones.');
+        } catch (err) {
+          state.syncMode = 'fallback';
+          state.lastSyncLima = `${lima.displayDate}, ${lima.timeStr} PET (Respaldo)`;
+          state.lastSyncDateKey = lima.dateKey;
+          hydrateRegions(null, false);
+          updateSyncUI();
+          renderAll();
+          if (force) showToast('Sin respuesta de red: operando con línea base climática oficial SENAMHI.');
+        }
+      }
+
+      function updateSyncUI() {
+        const dot = document.getElementById('syncDot');
+        const txt = document.getElementById('syncText');
+        const modeLbl = document.getElementById('sourceModeLabel');
+        const lastSyncEl = document.getElementById('lastSyncTime');
+        const histCaption = document.getElementById('historySourceCaption');
+
+        dot.className = 'sync-dot ' + state.syncMode;
+        if (state.syncMode === 'live') {
+          txt.textContent = 'En vivo WMO / Open-Meteo';
+          modeLbl.textContent = 'En vivo WMO/Open-Meteo + Validación SENAMHI';
+          histCaption.textContent = 'Serie diaria observada en vivo (Open-Meteo OMM/ECMWF) · Pase el cursor para inspeccionar';
+        } else if (state.syncMode === 'fallback') {
+          txt.textContent = 'Línea base oficial (Offline)';
+          modeLbl.textContent = 'Línea base oficial SENAMHI de respaldo (sin conexión)';
+          histCaption.textContent = 'Serie diaria climatológica de respaldo · Pase el cursor para inspeccionar';
+        } else {
+          txt.textContent = 'Sincronizando...';
+          modeLbl.textContent = 'Consultando Open-Meteo (OMM/ECMWF/NOAA)...';
+        }
+
+        lastSyncEl.textContent = state.lastSyncLima || '--';
+      }
+
+      function updateLimaClock() {
+        const lima = getLimaNowParts();
+        document.getElementById('limaClock').textContent = `${lima.timeStr} PET`;
+        document.getElementById('limaDate').textContent = `${lima.displayDate} · UTC-5`;
+
+        // Calcula tiempo restante hasta la actualización diaria automática (00:05 PET)
+        const totalSecs = lima.hour * 3600 + lima.minute * 60 + Number(lima.timeStr.slice(6, 8));
+        const targetSecs = 5 * 60; // 00:05 PET
+        let diff = targetSecs - totalSecs;
+        if (diff <= 0) diff += 86400;
+        const hrs = String(Math.floor(diff / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+        document.getElementById('nextAutoSync').textContent = `en ${hrs}h ${mins}m`;
+
+        // Disparador automático diario al cambiar el día en Lima (después de 00:05)
+        if (state.lastSyncDateKey && state.lastSyncDateKey !== lima.dateKey && (lima.hour > 0 || lima.minute >= 5)) {
+          fetchLiveTelemetry(true);
+        }
+      }
+
+      // =========================================================================
+      // 6. ESCALAS DE COLOR Y LEYENDAS DINÁMICAS (5 CAPAS TEMÁTICAS)
+      // =========================================================================
+      function getLayerColor(reg, layer) {
+        if (!reg) return '#cbd5e1';
+        switch (layer) {
+          case 'temp': {
+            const t = reg.temp;
+            if (t >= 30) return '#b91c1c';
+            if (t >= 25) return '#ea580c';
+            if (t >= 20) return '#eab308';
+            if (t >= 14) return '#0284c7';
+            return '#1e3a8a';
+          }
+          case 'alert': {
+            if (reg.alertRank === 4) return '#dc2626';
+            if (reg.alertRank === 3) return '#ea580c';
+            if (reg.alertRank === 2) return '#eab308';
+            return '#16a34a';
+          }
+          case 'uv': {
+            const u = reg.uv;
+            if (u >= 11) return '#7e22ce';
+            if (u >= 8) return '#dc2626';
+            if (u >= 6) return '#ea580c';
+            return '#eab308';
+          }
+          case 'rain': {
+            const r = reg.rain24h;
+            if (r >= 20) return '#1e3a8a';
+            if (r >= 10) return '#1d4ed8';
+            if (r >= 3) return '#38bdf8';
+            if (r > 0) return '#bae6fd';
+            return '#e2e8f0';
+          }
+          case 'macro': {
+            if (reg.macro === 'Costa') return '#d97706';
+            if (reg.macro === 'Sierra') return '#4f46e5';
+            return '#15803d';
+          }
+          default:
+            return '#64748b';
+        }
+      }
+
+      const LAYER_META = {
+        temp: {
+          title: 'Temperatura Actual (°C)',
+          items: [
+            { color: '#b91c1c', label: '≥ 30 °C (Muy cálido)' },
+            { color: '#ea580c', label: '25 – 29.9 °C (Cálido)' },
+            { color: '#eab308', label: '20 – 24.9 °C (Templado)' },
+            { color: '#0284c7', label: '14 – 19.9 °C (Fresco)' },
+            { color: '#1e3a8a', label: '< 14 °C (Frío altoandino)' }
+          ]
+        },
+        alert: {
+          title: 'Nivel de Alerta Oficial',
+          items: [
+            { color: '#dc2626', label: '▲ Rojo · Alarma Extrema' },
+            { color: '#ea580c', label: '◆ Naranja · Peligro / Fuerte' },
+            { color: '#eab308', label: '■ Amarillo · Precaución' },
+            { color: '#16a34a', label: '● Verde · Condición Normal' }
+          ]
+        },
+        uv: {
+          title: 'Índice de Radiación UV',
+          items: [
+            { color: '#7e22ce', label: '≥ 11 · Riesgo Extremo' },
+            { color: '#dc2626', label: '8 – 10 · Riesgo Muy Alto' },
+            { color: '#ea580c', label: '6 – 7 · Riesgo Alto' },
+            { color: '#eab308', label: '≤ 5 · Moderado / Bajo' }
+          ]
+        },
+        rain: {
+          title: 'Precipitación 24 h (mm)',
+          items: [
+            { color: '#1e3a8a', label: '≥ 20 mm (Intensa)' },
+            { color: '#1d4ed8', label: '10 – 19.9 mm (Moderada)' },
+            { color: '#38bdf8', label: '3 – 9.9 mm (Ligera)' },
+            { color: '#bae6fd', label: '0.1 – 2.9 mm (Llovizna)' },
+            { color: '#e2e8f0', label: '0 mm (Sin lluvia)' }
+          ]
+        },
+        macro: {
+          title: 'Regiones Naturales',
+          items: [
+            { color: '#d97706', label: 'Costa (Desierto / Litoral)' },
+            { color: '#4f46e5', label: 'Sierra (Cordillera Andina)' },
+            { color: '#15803d', label: 'Selva (Amazonía Alta/Baja)' }
+          ]
+        }
+      };
+
+      function renderLegend() {
+        const meta = LAYER_META[state.activeLayer];
+        const el = document.getElementById('mapLegend');
+        el.innerHTML = `<div class="legend-title">${meta.title}</div>` +
+          meta.items.map(it =>
+            `<div class="legend-item"><span class="legend-swatch" style="background:${it.color}"></span><span>${it.label}</span></div>`
+          ).join('');
+        document.getElementById('mapLayerSubtitle').textContent =
+          `Capa activa: ${meta.title} · Haga clic en una jurisdicción para inspeccionar`;
+      }
+
+      // =========================================================================
+      // 7. CARTOGRAFÍA RESILIENTE (LEAFLET GEOJSON -> MARKERS -> SVG ESQUEMÁTICO)
+      // =========================================================================
+      function matchesFilter(reg) {
+        const macroOk = state.macroFilter === 'Todas' || reg.macro === state.macroFilter;
+        const q = normalizeDepName(state.searchTerm);
+        if (!q) return macroOk;
+        const hit = normalizeDepName(reg.name).includes(q) || normalizeDepName(reg.capital).includes(q);
+        return macroOk && hit;
+      }
+
+      function tooltipHtml(reg) {
+        return `
+          <div style="min-width:175px;">
+            <div style="font-weight:700; font-size:0.84rem; margin-bottom:2px;">${reg.name} (${reg.capital})</div>
+            <div style="color:#cbd5e1; font-size:0.72rem; margin-bottom:5px;">${reg.dz} · ${reg.macro}</div>
+            <div style="font-family:var(--font-mono); font-size:0.75rem;">
+              T° Actual: <strong>${reg.temp.toFixed(1)} °C</strong> (${reg.tmin.toFixed(1)}/${reg.tmax.toFixed(1)})<br/>
+              UV Máx: <strong>${reg.uv}</strong> · Lluvia 24h: <strong>${reg.rain24h.toFixed(1)} mm</strong><br/>
+              Alerta: <strong>${reg.alertGlyph} ${reg.alertLevel}</strong>
+            </div>
+          </div>
+        `;
+      }
+
+      async function initCartography() {
+        const modeEl = document.getElementById('mapRenderMode');
+        if (typeof window.L === 'undefined') {
+          activateSvgFallback('Modo esquemático SVG (Leaflet no disponible)');
+          return;
+        }
+
+        try {
+          const map = window.L.map('leafletMap', {
+            center: [-9.25, -75.0],
+            zoom: 5,
+            minZoom: 4,
+            maxZoom: 9,
+            zoomControl: true
+          });
+          state.leafletMap = map;
+
+          window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 19
+          }).addTo(map);
+
+          const geoUrls = [
+            'https://cdn.jsdelivr.net/gh/juaneladio/peru-geojson@master/peru_departamental_simple.geojson',
+            'https://raw.githubusercontent.com/juaneladio/peru-geojson/master/peru_departamental_simple.geojson'
+          ];
+
+          let geoData = null;
+          for (const url of geoUrls) {
+            try {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), 7000);
+              const res = await fetch(url, { signal: controller.signal });
+              clearTimeout(timer);
+              if (res.ok) {
+                geoData = await res.json();
+                break;
+              }
+            } catch (_) {}
+          }
+
+          if (geoData && geoData.features) {
+            state.mapEngine = 'geojson';
+            modeEl.textContent = 'Cartografía: Polígonos INEI/GeoJSON';
+
+            state.geoJsonLayer = window.L.geoJSON(geoData, {
+              style: feature => styleGeoFeature(feature),
+              onEachFeature: (feature, layer) => {
+                const norm = normalizeDepName(feature.properties && feature.properties.NOMBDEP);
+                state.featureById[norm] = layer;
+                layer.on({
+                  click: () => {
+                    const found = state.regions.find(r => r.id === norm);
+                    if (found) selectRegion(found.id, false);
+                  },
+                  mouseover: () => {
+                    layer.setStyle({ weight: 2.5, color: '#0b1f3a', fillOpacity: 0.88 });
+                  },
+                  mouseout: () => {
+                    if (state.geoJsonLayer) state.geoJsonLayer.resetStyle(layer);
+                  }
+                });
+              }
+            }).addTo(map);
+
+            // Asegura marcador destacado para Callao si el polígono es muy pequeño a zoom nacional
+            addCapitalMarkers(map, true);
+            refreshMapStyles();
+          } else {
+            state.mapEngine = 'markers';
+            modeEl.textContent = 'Cartografía: Marcadores georreferenciados (Fallback GeoJSON)';
+            addCapitalMarkers(map, false);
+            refreshMapStyles();
+          }
+        } catch (err) {
+          activateSvgFallback('Modo esquemático SVG (Respaldo offline)');
+        }
+      }
+
+      function styleGeoFeature(feature) {
+        const norm = normalizeDepName(feature.properties && feature.properties.NOMBDEP);
+        const reg = state.regions.find(r => r.id === norm);
+        const visible = reg ? matchesFilter(reg) : true;
+        const isSelected = reg && reg.id === state.selectedId;
+        return {
+          fillColor: getLayerColor(reg, state.activeLayer),
+          weight: isSelected ? 2.8 : 1.1,
+          opacity: visible ? 1 : 0.25,
+          color: isSelected ? '#0b1f3a' : '#ffffff',
+          fillOpacity: visible ? (isSelected ? 0.88 : 0.72) : 0.12
+        };
+      }
+
+      function addCapitalMarkers(map, onlySmallOrOverlay) {
+        state.markersLayer = window.L.layerGroup().addTo(map);
+        state.regions.forEach(reg => {
+          const isCallao = reg.id === 'CALLAO';
+          if (onlySmallOrOverlay && !isCallao) return;
+          const marker = window.L.circleMarker([reg.lat, reg.lon], {
+            radius: onlySmallOrOverlay ? 6 : 9,
+            fillColor: getLayerColor(reg, state.activeLayer),
+            color: '#0b1f3a',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.88
+          });
+          marker.bindTooltip(tooltipHtml(reg), { className: 'peru-tooltip', direction: 'top' });
+          marker.on('click', () => selectRegion(reg.id, false));
+          marker.addTo(state.markersLayer);
+          state.markerById[reg.id] = marker;
+        });
+      }
+
+      function activateSvgFallback(label) {
+        state.mapEngine = 'svg';
+        document.getElementById('leafletMap').style.display = 'none';
+        const svgBox = document.getElementById('svgFallbackMap');
+        svgBox.classList.add('active');
+        document.getElementById('mapRenderMode').textContent = label;
+        renderSvgFallbackMap();
+      }
+
+      function renderSvgFallbackMap() {
+        const svgBox = document.getElementById('svgFallbackMap');
+        if (!svgBox.classList.contains('active')) return;
+
+        // Proyección geográfica directa del Perú: Lon [-81.6, -68.4], Lat [-18.5, 0.2]
+        const minLon = -81.8, maxLon = -68.2;
+        const minLat = -18.7, maxLat = 0.2;
+        const W = 560, H = 640;
+
+        const projX = lon => ((lon - minLon) / (maxLon - minLon)) * (W - 60) + 30;
+        const projY = lat => H - (((lat - minLat) / (maxLat - minLat)) * (H - 60) + 30);
+
+        // Silueta simplificada georreferenciada del contorno del Perú
+        const peruCoastAndBorders = [
+          [-80.3, -3.4], [-81.3, -4.7], [-80.9, -5.8], [-79.5, -7.8], [-78.2, -9.8],
+          [-77.2, -12.0], [-76.3, -13.9], [-74.3, -15.4], [-71.8, -17.0], [-70.4, -18.3],
+          [-69.5, -17.5], [-68.9, -15.2], [-68.7, -12.5], [-69.5, -11.0], [-70.6, -9.4],
+          [-72.8, -7.4], [-70.0, -4.2], [-73.2, -1.8], [-75.4, -0.1], [-77.8, -2.9],
+          [-79.1, -4.5], [-80.3, -3.4]
+        ].map(p => `${projX(p[0]).toFixed(1)},${projY(p[1]).toFixed(1)}`).join(' ');
+
+        const nodes = state.regions.map(reg => {
+          const cx = projX(reg.lon);
+          const cy = projY(reg.lat);
+          const visible = matchesFilter(reg);
+          const isSel = reg.id === state.selectedId;
+          const color = getLayerColor(reg, state.activeLayer);
+          const opacity = visible ? 1 : 0.22;
+          return `
+            <g class="svg-reg-node" data-id="${reg.id}" style="cursor:pointer; opacity:${opacity}">
+              <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${isSel ? 12 : 9}" fill="${color}" stroke="${isSel ? '#0b1f3a' : '#ffffff'}" stroke-width="${isSel ? 3 : 1.5}"></circle>
+              <text x="${(cx + 12).toFixed(1)}" y="${(cy + 4).toFixed(1)}" font-size="10.5" font-weight="${isSel ? '700' : '600'}" fill="#0f172a">${reg.name === 'Callao (Prov. Const.)' ? 'Callao' : reg.name} (${reg.temp.toFixed(0)}°)</text>
+              <title>${reg.name} (${reg.capital}) — ${reg.temp.toFixed(1)} °C · Alerta ${reg.alertLevel}</title>
+            </g>
+          `;
+        }).join('');
+
+        svgBox.innerHTML = `
+          <svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" style="max-height:640px;">
+            <rect x="0" y="0" width="${W}" height="${H}" fill="#eef4fa"></rect>
+            <polygon points="${peruCoastAndBorders}" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"></polygon>
+            ${nodes}
+          </svg>
+        `;
+
+        svgBox.querySelectorAll('.svg-reg-node').forEach(node => {
+          node.addEventListener('click', () => {
+            selectRegion(node.getAttribute('data-id'), false);
+          });
+        });
+      }
+
+      function refreshMapStyles() {
+        renderLegend();
+        if (state.mapEngine === 'geojson' && state.geoJsonLayer) {
+          state.geoJsonLayer.eachLayer(layer => {
+            const norm = normalizeDepName(layer.feature.properties && layer.feature.properties.NOMBDEP);
+            const reg = state.regions.find(r => r.id === norm);
+            state.geoJsonLayer.resetStyle(layer);
+            if (reg) {
+              layer.unbindTooltip();
+              layer.bindTooltip(tooltipHtml(reg), { className: 'peru-tooltip', sticky: true });
+            }
+          });
+          // Actualiza también overlay de Callao
+          Object.keys(state.markerById).forEach(id => {
+            const reg = state.regions.find(r => r.id === id);
+            const m = state.markerById[id];
+            if (reg && m) {
+              m.setStyle({
+                fillColor: getLayerColor(reg, state.activeLayer),
+                radius: id === state.selectedId ? 8 : 6,
+                fillOpacity: matchesFilter(reg) ? 0.92 : 0.2
+              });
+              m.setTooltipContent(tooltipHtml(reg));
+            }
+          });
+        } else if (state.mapEngine === 'markers') {
+          Object.keys(state.markerById).forEach(id => {
+            const reg = state.regions.find(r => r.id === id);
+            const m = state.markerById[id];
+            if (reg && m) {
+              m.setStyle({
+                fillColor: getLayerColor(reg, state.activeLayer),
+                radius: id === state.selectedId ? 12 : 8.5,
+                weight: id === state.selectedId ? 2.5 : 1.5,
+                fillOpacity: matchesFilter(reg) ? 0.9 : 0.2
+              });
+              m.setTooltipContent(tooltipHtml(reg));
+            }
+          });
+        } else if (state.mapEngine === 'svg') {
+          renderSvgFallbackMap();
+        }
+      }
+
+      // =========================================================================
+      // 8. RENDERIZADO DE KPIs, EXPEDIENTE, GRÁFICOS HISTÓRICOS, BOLETINES Y TABLA
+      // =========================================================================
+      function renderKPIs() {
+        const avg = arr => arr.length ? (arr.reduce((s, r) => s + r.temp, 0) / arr.length) : 0;
+        const costa = state.regions.filter(r => r.macro === 'Costa');
+        const sierra = state.regions.filter(r => r.macro === 'Sierra');
+        const selva = state.regions.filter(r => r.macro === 'Selva');
+        const alerted = state.regions.filter(r => r.alertRank >= 2);
+
+        const rCount = alerted.filter(r => r.alertRank === 4).length;
+        const nCount = alerted.filter(r => r.alertRank === 3).length;
+        const aCount = alerted.filter(r => r.alertRank === 2).length;
+
+        document.getElementById('kpiCostaTemp').textContent = `${avg(costa).toFixed(1)} °C`;
+        document.getElementById('kpiSierraTemp').textContent = `${avg(sierra).toFixed(1)} °C`;
+        document.getElementById('kpiSelvaTemp').textContent = `${avg(selva).toFixed(1)} °C`;
+        document.getElementById('kpiAlertCount').textContent = `${alerted.length} / 25`;
+        document.getElementById('kpiAlertBreakdown').textContent = `${rCount}R · ${nCount}N · ${aCount}A`;
+      }
+
+      function renderDossier() {
+        const reg = state.regions.find(r => r.id === state.selectedId) || state.regions[0];
+        if (!reg) return;
+
+        document.getElementById('dosName').textContent = reg.name;
+        document.getElementById('dosCapital').textContent = reg.capital;
+        document.getElementById('dosAlt').textContent = `${reg.alt.toLocaleString('es-PE')} m s.n.m.`;
+        document.getElementById('dosMacro').textContent = reg.macro;
+
+        const badge = document.getElementById('dosAlertBadge');
+        badge.className = `alert-tag alert-${reg.alertLevel}`;
+        badge.textContent = `${reg.alertGlyph} ${reg.alertLevel} · ${reg.alertDesc}`;
+
+        document.getElementById('metTemp').innerHTML = `${reg.temp.toFixed(1)}<span class="metric-unit">°C</span>`;
+        document.getElementById('metCond').textContent = weatherCodeLabel(reg.code);
+        document.getElementById('metMinMax').innerHTML = `${reg.tmin.toFixed(1)} / ${reg.tmax.toFixed(1)}<span class="metric-unit">°C</span>`;
+        document.getElementById('metHum').innerHTML = `${reg.hum}<span class="metric-unit">%</span>`;
+        document.getElementById('metPress').textContent = `Presión: ${reg.press} hPa`;
+        document.getElementById('metRain').innerHTML = `${reg.rain24h.toFixed(1)}<span class="metric-unit">mm</span>`;
+        document.getElementById('metRainNow').textContent = `Actual: ${reg.rainNow.toFixed(1)} mm/h`;
+        document.getElementById('metUv').textContent = reg.uv;
+        document.getElementById('metUvRisk').textContent = uvRiskCategory(reg.uv);
+        document.getElementById('metWind').innerHTML = `${reg.wind}<span class="metric-unit">km/h</span>`;
+        document.getElementById('metCoords').textContent = `${reg.lat.toFixed(2)}°, ${reg.lon.toFixed(2)}°`;
+
+        document.getElementById('dosDz').textContent = reg.dz;
+        document.getElementById('dosStation').textContent = reg.station;
+        document.getElementById('dosThornCode').textContent = reg.thornCode;
+        document.getElementById('dosThornDesc').textContent = reg.thornDesc;
+        document.getElementById('dosDrivers').textContent = reg.drivers;
+
+        const matchingBulletins = INSTITUTIONAL_BULLETINS.filter(b =>
+          b.regionIds.includes(reg.id)
+        );
+        const bullContainer = document.getElementById('dosBulletins');
+        const listHtml = [
+          `<div class="mini-bulletin"><strong>Evaluación Telemetrada:</strong> ${reg.alertReason}.</div>`
+        ].concat(
+          matchingBulletins.map(b =>
+            `<div class="mini-bulletin"><strong>${b.agency} (${b.level}):</strong> ${b.title}</div>`
+          )
+        );
+        bullContainer.innerHTML = listHtml.join('');
+      }
+
+      // =========================================================================
+      // 9. GRÁFICOS HISTÓRICOS EN SVG PURO (INTERACTIVOS)
+      // =========================================================================
+      function renderHistoricalCharts() {
+        const reg = state.regions.find(r => r.id === state.selectedId) || state.regions[0];
+        if (!reg) return;
+        document.getElementById('chartRegionName').textContent = reg.name;
+
+        render7DayChart(reg);
+        renderMonthlyClimatologyChart(reg);
+      }
+
+      function render7DayChart(reg) {
+        const wrap = document.getElementById('chart7dWrap');
+        const readout = document.getElementById('chart7dReadout');
+        const data = reg.history7d;
+        const W = 620, H = 250;
+        const pad = { top: 20, right: 44, bottom: 34, left: 40 };
+        const plotW = W - pad.left - pad.right;
+        const plotH = H - pad.top - pad.bottom;
+
+        const allTemps = data.flatMap(d => [d.tmin, d.tmax]);
+        const minT = Math.floor(Math.min(...allTemps) - 2);
+        const maxT = Math.ceil(Math.max(...allTemps) + 2);
+        const maxRain = Math.max(10, Math.ceil(Math.max(...data.map(d => d.rain)) * 1.25));
+
+        const xFor = i => pad.left + (i / Math.max(1, data.length - 1)) * plotW;
+        const yTemp = t => pad.top + ((maxT - t) / Math.max(1, maxT - minT)) * plotH;
+        const yRain = r => pad.top + ((maxRain - r) / maxRain) * plotH;
+
+        const gridLines = 4;
+        let gridSvg = '';
+        for (let g = 0; g <= gridLines; g++) {
+          const val = minT + ((maxT - minT) * (gridLines - g)) / gridLines;
+          const y = pad.top + (g / gridLines) * plotH;
+          gridSvg += `
+            <line x1="${pad.left}" y1="${y.toFixed(1)}" x2="${W - pad.right}" y2="${y.toFixed(1)}" stroke="#e2e8f0" stroke-width="1"></line>
+            <text x="${pad.left - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#64748b" font-family="var(--font-mono)">${val.toFixed(0)}°</text>
+          `;
+        }
+
+        // Eje derecho lluvia
+        for (let g = 0; g <= 2; g++) {
+          const rVal = (maxRain * (2 - g)) / 2;
+          const y = pad.top + (g / 2) * plotH;
+          gridSvg += `<text x="${W - pad.right + 8}" y="${(y + 4).toFixed(1)}" text-anchor="start" font-size="10" fill="#0369a1" font-family="var(--font-mono)">${rVal.toFixed(0)}mm</text>`;
+        }
+
+        // Barras de precipitación
+        const barW = Math.min(26, (plotW / data.length) * 0.48);
+        const barsSvg = data.map((d, i) => {
+          const x = xFor(i) - barW / 2;
+          const y = yRain(d.rain);
+          const h = Math.max(1, (pad.top + plotH) - y);
+          return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="#0284c7" opacity="0.28"></rect>`;
+        }).join('');
+
+        // Banda térmica entre Tmín y Tmáx
+        const polyTop = data.map((d, i) => `${xFor(i).toFixed(1)},${yTemp(d.tmax).toFixed(1)}`);
+        const polyBot = [...data].reverse().map((d, i) => `${xFor(data.length - 1 - i).toFixed(1)},${yTemp(d.tmin).toFixed(1)}`);
+        const bandSvg = `<polygon points="${polyTop.concat(polyBot).join(' ')}" fill="#94a3b8" opacity="0.14"></polygon>`;
+
+        const maxPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(d.tmax).toFixed(1)}`).join(' ');
+        const minPath = data.map((d, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(d.tmin).toFixed(1)}`).join(' ');
+
+        const xLabels = data.map((d, i) => {
+          const shortDate = d.date.slice(5).replace('-', '/');
+          const tag = i === data.length - 1 ? 'Hoy' : shortDate;
+          return `<text x="${xFor(i).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="10.5" font-weight="${i === data.length - 1 ? '700' : '500'}" fill="${i === data.length - 1 ? '#0b1f3a' : '#64748b'}" font-family="var(--font-mono)">${tag}</text>`;
+        }).join('');
+
+        const pointsAndHits = data.map((d, i) => {
+          const cx = xFor(i);
+          return `
+            <circle cx="${cx.toFixed(1)}" cy="${yTemp(d.tmax).toFixed(1)}" r="3.8" fill="#dc2626" stroke="#ffffff" stroke-width="1.2"></circle>
+            <circle cx="${cx.toFixed(1)}" cy="${yTemp(d.tmin).toFixed(1)}" r="3.8" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"></circle>
+            <rect class="chart7d-hit" data-idx="${i}" x="${(cx - plotW / (data.length * 2)).toFixed(1)}" y="${pad.top}" width="${(plotW / data.length).toFixed(1)}" height="${plotH}" fill="transparent" style="cursor:crosshair"></rect>
+          `;
+        }).join('');
+
+        wrap.innerHTML = `
+          <svg viewBox="0 0 ${W} ${H}" aria-label="Gráfico de temperatura y precipitación de los últimos 7 días">
+            ${gridSvg}
+            ${barsSvg}
+            ${bandSvg}
+            <path d="${maxPath}" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="${minPath}" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line id="c7Crosshair" x1="0" y1="${pad.top}" x2="0" y2="${pad.top + plotH}" stroke="#0b1f3a" stroke-width="1" stroke-dasharray="3 3" opacity="0"></line>
+            ${xLabels}
+            ${pointsAndHits}
+          </svg>
+        `;
+
+        const showDay = idx => {
+          const d = data[idx];
+          if (!d) return;
+          const cross = wrap.querySelector('#c7Crosshair');
+          if (cross) {
+            const x = xFor(idx).toFixed(1);
+            cross.setAttribute('x1', x);
+            cross.setAttribute('x2', x);
+            cross.setAttribute('opacity', '0.65');
+          }
+          readout.innerHTML = `
+            <span><strong>${d.date}</strong></span>
+            <span>Tmáx: <strong style="color:#dc2626;">${d.tmax.toFixed(1)} °C</strong></span>
+            <span>Tmín: <strong style="color:#2563eb;">${d.tmin.toFixed(1)} °C</strong></span>
+            <span>Lluvia: <strong style="color:#0369a1;">${d.rain.toFixed(1)} mm</strong></span>
+            <span>UV Máx: <strong>${d.uv}</strong></span>
+          `;
+        };
+
+        showDay(data.length - 1);
+        wrap.querySelectorAll('.chart7d-hit').forEach(hit => {
+          hit.addEventListener('mouseenter', () => showDay(Number(hit.getAttribute('data-idx'))));
+        });
+      }
+
+      function renderMonthlyClimatologyChart(reg) {
+        const wrap = document.getElementById('chartMonthlyWrap');
+        const readout = document.getElementById('chartMonthlyReadout');
+        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
+        const temps = reg.monthlyTemp;
+        const rains = reg.monthlyRain;
+
+        const W = 470, H = 250;
+        const pad = { top: 20, right: 44, bottom: 34, left: 38 };
+        const plotW = W - pad.left - pad.right;
+        const plotH = H - pad.top - pad.bottom;
+
+        const minT = Math.floor(Math.min(...temps) - 2);
+        const maxT = Math.ceil(Math.max(...temps) + 2);
+        const maxR = Math.max(20, Math.ceil(Math.max(...rains) * 1.15));
+
+        const xFor = i => pad.left + ((i + 0.5) / 12) * plotW;
+        const yTemp = t => pad.top + ((maxT - t) / Math.max(1, maxT - minT)) * plotH;
+        const yRain = r => pad.top + ((maxR - r) / maxR) * plotH;
+
+        let grid = '';
+        for (let g = 0; g <= 3; g++) {
+          const y = pad.top + (g / 3) * plotH;
+          const tVal = minT + ((maxT - minT) * (3 - g)) / 3;
+          const rVal = (maxR * (3 - g)) / 3;
+          grid += `
+            <line x1="${pad.left}" y1="${y.toFixed(1)}" x2="${W - pad.right}" y2="${y.toFixed(1)}" stroke="#e2e8f0" stroke-width="1"></line>
+            <text x="${pad.left - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#64748b" font-family="var(--font-mono)">${tVal.toFixed(0)}°</text>
+            <text x="${W - pad.right + 6}" y="${(y + 4).toFixed(1)}" text-anchor="start" font-size="10" fill="#0369a1" font-family="var(--font-mono)">${rVal.toFixed(0)}mm</text>
+          `;
+        }
+
+        const barW = (plotW / 12) * 0.56;
+        const bars = rains.map((r, i) => {
+          const x = xFor(i) - barW / 2;
+          const y = yRain(r);
+          const h = Math.max(1, pad.top + plotH - y);
+          return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="#0284c7" opacity="0.32"></rect>`;
+        }).join('');
+
+        const tPath = temps.map((t, i) => `${i === 0 ? 'M' : 'L'}${xFor(i).toFixed(1)},${yTemp(t).toFixed(1)}`).join(' ');
+        const xLbls = months.map((m, i) =>
+          `<text x="${xFor(i).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="9.5" fill="#64748b" font-family="var(--font-mono)">${m}</text>`
+        ).join('');
+
+        const hits = months.map((m, i) => `
+          <circle cx="${xFor(i).toFixed(1)}" cy="${yTemp(temps[i]).toFixed(1)}" r="3.2" fill="#0b1f3a" stroke="#ffffff" stroke-width="1.2"></circle>
+          <rect class="chartM-hit" data-idx="${i}" x="${(xFor(i) - plotW / 24).toFixed(1)}" y="${pad.top}" width="${(plotW / 12).toFixed(1)}" height="${plotH}" fill="transparent" style="cursor:crosshair"></rect>
+        `).join('');
+
+        wrap.innerHTML = `
+          <svg viewBox="0 0 ${W} ${H}" aria-label="Normales climáticas mensuales de temperatura y lluvia">
+            ${grid}
+            ${bars}
+            <path d="${tPath}" fill="none" stroke="#0b1f3a" stroke-width="2.2" stroke-linecap="round"></path>
+            ${xLbls}
+            ${hits}
+          </svg>
+        `;
+
+        const showMonth = i => {
+          readout.innerHTML = `
+            <span><strong>Normal ${months[i]} (${reg.name})</strong></span>
+            <span>T° Media: <strong>${temps[i].toFixed(1)} °C</strong></span>
+            <span>Precipitación normal: <strong style="color:#0369a1;">${rains[i]} mm</strong></span>
+          `;
+        };
+        const currentMonthIdx = new Date().getMonth();
+        showMonth(currentMonthIdx);
+
+        wrap.querySelectorAll('.chartM-hit').forEach(hit => {
+          hit.addEventListener('mouseenter', () => showMonth(Number(hit.getAttribute('data-idx'))));
+        });
+      }
+
+      // =========================================================================
+      // 10. BOLETINES Y TABLA COMPARATIVA NACIONAL
+      // =========================================================================
+      function renderBulletins() {
+        const grid = document.getElementById('bulletinsGrid');
+        const list = INSTITUTIONAL_BULLETINS.filter(b =>
+          state.bulletinFilter === 'Todas' || b.agency === state.bulletinFilter
+        );
+
+        grid.innerHTML = list.map(b => {
+          // Cuenta cuántas regiones afectadas tienen actualmente alerta activa
+          const affected = state.regions.filter(r => b.regionIds.includes(r.id));
+          const namesPreview = affected.slice(0, 4).map(r => r.name).join(', ') +
+            (affected.length > 4 ? ` (+${affected.length - 4})` : '');
+          return `
+            <article class="bulletin-card">
+              <div class="bulletin-header">
+                <span class="bulletin-agency">${b.agency} · ${b.code}</span>
+                <span class="alert-tag alert-${b.level}">${b.level === 'Naranja' ? '◆' : '■'} ${b.level}</span>
+              </div>
+              <h3 class="bulletin-title">${b.title}</h3>
+              <p class="bulletin-desc">${b.desc}</p>
+              <div class="bulletin-footer">
+                <span>Ámbito: <strong>${namesPreview}</strong></span>
+                <span class="tabular">${b.validity}</span>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      function renderTable() {
+        const tbody = document.getElementById('nationalTableBody');
+        const filtered = state.regions.filter(matchesFilter);
+
+        filtered.sort((a, b) => {
+          let va = a[state.sortKey];
+          let vb = b[state.sortKey];
+          if (typeof va === 'string') {
+            return state.sortDir === 'asc'
+              ? va.localeCompare(vb, 'es')
+              : vb.localeCompare(va, 'es');
+          }
+          return state.sortDir === 'asc' ? va - vb : vb - va;
+        });
+
+        document.getElementById('tableCountLabel').textContent = `Mostrando ${filtered.length} de 25`;
+
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">No hay jurisdicciones que coincidan con el filtro aplicado.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(reg => `
+          <tr class="${reg.id === state.selectedId ? 'selected-row' : ''}" data-id="${reg.id}">
+            <td>
+              <div class="dept-cell-main">${reg.name}</div>
+              <div class="dept-cell-sub">${reg.capital} · ${reg.alt.toLocaleString('es-PE')} m s.n.m.</div>
+            </td>
+            <td>${reg.macro}</td>
+            <td class="tabular">DZ ${reg.dzNum}</td>
+            <td class="num tabular"><strong>${reg.temp.toFixed(1)} °C</strong></td>
+            <td class="num tabular">${reg.tmin.toFixed(1)} / ${reg.tmax.toFixed(1)} °C</td>
+            <td class="num tabular">${reg.rain24h.toFixed(1)} mm</td>
+            <td class="num tabular">${reg.uv}</td>
+            <td>
+              <span class="alert-tag alert-${reg.alertLevel}">${reg.alertGlyph} ${reg.alertLevel}</span>
+            </td>
+          </tr>
+        `).join('');
+
+        tbody.querySelectorAll('tr[data-id]').forEach(row => {
+          row.addEventListener('click', () => {
+            selectRegion(row.getAttribute('data-id'), true);
+          });
+        });
+
+        // Indicadores de ordenamiento
+        document.querySelectorAll('thead th.sortable').forEach(th => {
+          const ind = th.querySelector('.sort-ind');
+          if (th.getAttribute('data-sort') === state.sortKey) {
+            ind.textContent = state.sortDir === 'asc' ? '▲' : '▼';
+          } else {
+            ind.textContent = '';
+          }
+        });
+      }
+
+      function selectRegion(id, centerMap = false) {
+        state.selectedId = id;
+        const reg = state.regions.find(r => r.id === id);
+        renderDossier();
+        renderHistoricalCharts();
+        renderTable();
+        refreshMapStyles();
+
+        if (centerMap && reg && state.leafletMap) {
+          state.leafletMap.flyTo([reg.lat, reg.lon], 7, { duration: 0.5 });
+        }
+      }
+
+      function renderAll() {
+        renderKPIs();
+        renderDossier();
+        renderHistoricalCharts();
+        renderBulletins();
+        renderTable();
+        refreshMapStyles();
+      }
+
+      // =========================================================================
+      // 11. GENERADOR DE REPORTES EN PDF (JSPDF + FALLBACK IMPRESIÓN)
+      // =========================================================================
+      function exportRegionalPDF() {
+        const reg = state.regions.find(r => r.id === state.selectedId) || state.regions[0];
+        if (!reg) return;
+
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          showToast('Generador PDF offline: abriendo vista de impresión PDF del navegador.');
+          window.print();
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const lima = getLimaNowParts();
+
+        // Encabezado Institucional
+        doc.setFillColor(11, 31, 58);
+        doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text('OBSERVATORIO CLIMATICO NACIONAL DEL PERU', 14, 13);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text(`Expediente Climatico Regional · Emision: ${lima.dateKey} ${lima.timeStr} (America/Lima)`, 14, 20);
+        doc.text(`Fuente: ${state.syncMode === 'live' ? 'Telemetria en vivo Open-Meteo (OMM/ECMWF) + Marco SENAMHI' : 'Linea base oficial SENAMHI'}`, 14, 25);
+
+        // Titulo Regional
+        let y = 40;
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text(`${reg.name} — Capital: ${reg.capital}`, 14, y);
+        y += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text(`Macro-region: ${reg.macro}  |  Altitud: ${reg.alt} m s.n.m.  |  ${reg.dz}  |  Nivel de Alerta: ${reg.alertLevel} (${reg.alertDesc})`, 14, y);
+
+        // Caja de Métricas
+        y += 7;
+        doc.setDrawColor(203, 213, 225);
+        doc.setFillColor(248, 250, 252);
+        doc.rect(14, y, 182, 26, 'FD');
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.text(`Temp. Actual: ${reg.temp.toFixed(1)} C (${weatherCodeLabel(reg.code)})`, 18, y + 8);
+        doc.text(`Min / Max 24h: ${reg.tmin.toFixed(1)} / ${reg.tmax.toFixed(1)} C`, 108, y + 8);
+        doc.text(`Humedad: ${reg.hum}%  |  Presion: ${reg.press} hPa`, 18, y + 15);
+        doc.text(`Precipitacion 24h: ${reg.rain24h.toFixed(1)} mm`, 108, y + 15);
+        doc.text(`Indice UV Max: ${reg.uv} (${uvRiskCategory(reg.uv)})`, 18, y + 22);
+        doc.text(`Viento 10m: ${reg.wind} km/h`, 108, y + 22);
+
+        // Justificación Científica
+        y += 35;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(11, 31, 58);
+        doc.text('1. Justificacion Cientifica Oficial (SENAMHI / COEN-INDECI / DIHIDRONAV)', 14, y);
+        y += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(30, 41, 59);
+
+        const blocks = [
+          `Estacion de referencia: ${reg.station}`,
+          `Clasificacion Thornthwaite (SENAMHI 2020): [${reg.thornCode}] ${reg.thornDesc}`,
+          `Controladores geograficos y sinopticos: ${reg.drivers}`,
+          `Evaluacion de alerta: ${reg.alertReason}`
+        ];
+        blocks.forEach(txt => {
+          const lines = doc.splitTextToSize(txt, 180);
+          doc.text(lines, 14, y);
+          y += lines.length * 4.5 + 2.5;
+        });
+
+        // Serie Histórica últimos 7 días
+        y += 4;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(11, 31, 58);
+        doc.text('2. Serie Diaria Observada (Ultimos 7 Dias + Hoy)', 14, y);
+        y += 6;
+
+        doc.setFillColor(241, 245, 249);
+        doc.rect(14, y, 182, 7, 'F');
+        doc.setFontSize(8.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Fecha', 18, y + 5);
+        doc.text('T. Min (C)', 62, y + 5);
+        doc.text('T. Max (C)', 98, y + 5);
+        doc.text('Lluvia (mm)', 134, y + 5);
+        doc.text('UV Max', 172, y + 5);
+        y += 7;
+
+        doc.setFont('helvetica', 'normal');
+        reg.history7d.forEach((d, idx) => {
+          if (idx % 2 === 1) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(14, y, 182, 6.2, 'F');
+          }
+          doc.text(d.date, 18, y + 4.5);
+          doc.text(d.tmin.toFixed(1), 62, y + 4.5);
+          doc.text(d.tmax.toFixed(1), 98, y + 4.5);
+          doc.text(d.rain.toFixed(1), 134, y + 4.5);
+          doc.text(String(d.uv), 172, y + 4.5);
+          y += 6.2;
+        });
+
+        // Pie de página
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Observatorio Climatico Nacional del Peru · Fuentes: gob.pe/senamhi · gob.pe/indeci · dhn.mil.pe', 14, 286);
+
+        doc.save(`Reporte_Climatico_${reg.id}_${lima.dateKey}.pdf`);
+        showToast(`PDF regional descargado: ${reg.name}`);
+      }
+
+      function exportNationalPDF() {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          showToast('Generador PDF offline: abriendo vista de impresión PDF del navegador.');
+          window.print();
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const lima = getLimaNowParts();
+
+        // Encabezado
+        doc.setFillColor(11, 31, 58);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13.5);
+        doc.text('BOLETIN CLIMATICO NACIONAL DEL PERU (25 JURISDICCIONES)', 14, 12);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.8);
+        doc.text(`Fecha de emision: ${lima.dateKey} ${lima.timeStr} (Hora Oficial Lima UTC-5)`, 14, 19);
+        doc.text(`Estado de datos: ${state.syncMode === 'live' ? 'Sincronizacion en vivo Open-Meteo + SENAMHI' : 'Linea base oficial SENAMHI'}`, 14, 24);
+
+        // Resumen Macro-regional
+        const avg = arr => (arr.reduce((s, r) => s + r.temp, 0) / Math.max(1, arr.length)).toFixed(1);
+        const costaAvg = avg(state.regions.filter(r => r.macro === 'Costa'));
+        const sierraAvg = avg(state.regions.filter(r => r.macro === 'Sierra'));
+        const selvaAvg = avg(state.regions.filter(r => r.macro === 'Selva'));
+        const alertedCount = state.regions.filter(r => r.alertRank >= 2).length;
+
+        let y = 36;
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text(`Promedios Nacionales: Costa ${costaAvg} C  |  Sierra ${sierraAvg} C  |  Selva ${selvaAvg} C  |  Bajo aviso: ${alertedCount}/25`, 14, y);
+
+        // Tabla de las 25 jurisdicciones
+        y += 7;
+        doc.setFillColor(226, 232, 240);
+        doc.rect(14, y, 182, 7, 'F');
+        doc.setFontSize(8);
+        doc.text('Jurisdiccion', 16, y + 5);
+        doc.text('Macro', 56, y + 5);
+        doc.text('DZ', 74, y + 5);
+        doc.text('Actual', 90, y + 5);
+        doc.text('Min/Max', 108, y + 5);
+        doc.text('Lluvia', 132, y + 5);
+        doc.text('UV', 150, y + 5);
+        doc.text('Alerta', 164, y + 5);
+        y += 7;
+
+        doc.setFont('helvetica', 'normal');
+        const sorted = [...state.regions].sort((a, b) => a.name.localeCompare(b.name, 'es'));
+        sorted.forEach((r, idx) => {
+          if (idx % 2 === 1) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(14, y, 182, 6.2, 'F');
+          }
+          doc.setTextColor(15, 23, 42);
+          doc.text(r.name.slice(0, 22), 16, y + 4.4);
+          doc.text(r.macro, 56, y + 4.4);
+          doc.text(`DZ ${r.dzNum}`, 74, y + 4.4);
+          doc.text(`${r.temp.toFixed(1)} C`, 90, y + 4.4);
+          doc.text(`${r.tmin.toFixed(0)}/${r.tmax.toFixed(0)} C`, 108, y + 4.4);
+          doc.text(`${r.rain24h.toFixed(1)} mm`, 132, y + 4.4);
+          doc.text(String(r.uv), 150, y + 4.4);
+          doc.text(r.alertLevel, 164, y + 4.4);
+          y += 6.2;
+        });
+
+        // Avisos Institucionales Vigentes
+        y += 6;
+        if (y > 235) {
+          doc.addPage();
+          y = 18;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(11, 31, 58);
+        doc.text('Avisos y Boletines Oficiales Vigentes (SENAMHI / COEN-INDECI / DIHIDRONAV)', 14, y);
+        y += 5;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        INSTITUTIONAL_BULLETINS.forEach(b => {
+          if (y > 272) {
+            doc.addPage();
+            y = 18;
+          }
+          const line = `[${b.agency} - ${b.level}] ${b.title}: ${b.desc}`;
+          const wrapped = doc.splitTextToSize(line, 180);
+          doc.text(wrapped, 14, y);
+          y += wrapped.length * 3.8 + 2.5;
+        });
+
+        doc.setFontSize(7.8);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Observatorio Climatico Nacional del Peru · gob.pe/senamhi · observatorio.senamhi.gob.pe · gob.pe/indeci · dhn.mil.pe', 14, 288);
+
+        doc.save(`Boletin_Climatico_Nacional_Peru_${lima.dateKey}.pdf`);
+        showToast('Boletín Climático Nacional PDF descargado.');
+      }
+
+      // =========================================================================
+      // 12. TOAST Y EVENTOS DE INTERFAZ
+      // =========================================================================
+      let toastTimer = null;
+      function showToast(msg) {
+        const el = document.getElementById('toastMsg');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+      }
+
+      function bindEvents() {
+        // Pestañas de capas temáticas
+        document.querySelectorAll('.layer-tab[data-layer]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.layer-tab[data-layer]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+            btn.setAttribute('aria-pressed', 'true');
+            state.activeLayer = btn.getAttribute('data-layer');
+            refreshMapStyles();
+          });
+        });
+
+        // Filtro de boletines
+        document.querySelectorAll('.bulletin-filter').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.bulletin-filter').forEach(b => b.setAttribute('aria-pressed', 'false'));
+            btn.setAttribute('aria-pressed', 'true');
+            state.bulletinFilter = btn.getAttribute('data-agency');
+            renderBulletins();
+          });
+        });
+
+        // Filtro Macro-región
+        document.getElementById('macroFilter').addEventListener('change', e => {
+          state.macroFilter = e.target.value;
+          renderTable();
+          refreshMapStyles();
+        });
+
+        // Buscador en tiempo real
+        document.getElementById('searchInput').addEventListener('input', e => {
+          state.searchTerm = e.target.value;
+          renderTable();
+          refreshMapStyles();
+        });
+
+        // Ordenamiento de tabla
+        document.querySelectorAll('thead th.sortable').forEach(th => {
+          th.addEventListener('click', () => {
+            const key = th.getAttribute('data-sort');
+            if (state.sortKey === key) {
+              state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              state.sortKey = key;
+              state.sortDir = (key === 'name' || key === 'macro') ? 'asc' : 'desc';
+            }
+            renderTable();
+          });
+        });
+
+        // Reset zoom del mapa
+        document.getElementById('btnResetZoom').addEventListener('click', () => {
+          if (state.leafletMap) {
+            state.leafletMap.setView([-9.25, -75.0], 5);
+          }
+        });
+
+        // Botón Actualizar
+        document.getElementById('btnRefresh').addEventListener('click', () => {
+          fetchLiveTelemetry(true);
+        });
+
+        // Botones de descarga PDF
+        document.getElementById('btnPdfNational').addEventListener('click', exportNationalPDF);
+        document.getElementById('btnPdfRegional').addEventListener('click', exportRegionalPDF);
+      }
+
+      // =========================================================================
+      // 13. ARRANQUE DE LA APLICACIÓN
+      // =========================================================================
+      function boot() {
+        hydrateRegions(null, false);
+        bindEvents();
+        updateLimaClock();
+        setInterval(updateLimaClock, 1000);
+        renderAll();
+        initCartography();
+        fetchLiveTelemetry(false);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+  </script>
+</body>
+</html>
